@@ -13,11 +13,10 @@ function SidebarTreeNode({ node, depth = 0 }: { node: TopicNode; depth?: number 
 
   return (
     <li>
-      <button
+      <a
+        href={`#${node.id}`}
         onClick={() => hasChildren && setOpen(o => !o)}
-        className={`w-full text-left flex items-center gap-2 py-1.5 rounded text-sm transition-colors
-          ${hasChildren ? "cursor-pointer" : "cursor-default"}
-          text-neutral-300 hover:text-white hover:bg-neutral-800/60`}
+        className="w-full text-left flex items-center gap-2 py-1.5 rounded text-sm transition-colors text-neutral-300 hover:text-white hover:bg-neutral-800/60"
         style={{ paddingLeft: `${8 + depth * 14}px`, paddingRight: "8px" }}
       >
         {node.iconName && (() => {
@@ -30,7 +29,7 @@ function SidebarTreeNode({ node, depth = 0 }: { node: TopicNode; depth?: number 
             ? <ChevronDown className="w-3.5 h-3.5 flex-shrink-0 text-neutral-500" />
             : <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-neutral-500" />
         )}
-      </button>
+      </a>
       {hasChildren && open && (
         <ul>
           {node.children!.map(child => (

@@ -153,6 +153,7 @@ function TopicSection({ node, index }: { node: TopicNode; index: number }) {
           {node.children.map((child, ci) => (
             <motion.div
               key={child.id}
+              id={child.id}
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
