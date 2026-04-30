@@ -18,11 +18,50 @@ A personalized learning website built with Next.js 15 App Router, TypeScript, Ta
 | Dynamic tech routes | `src/app/tech/[id]/page.tsx` |
 | Reusable UI components | `src/components/PascalCase.tsx` |
 | Data & types | `src/data/technologies.ts` |
+| Component CSS modules | `src/components/ComponentName.module.css` |
+| Page CSS modules | `src/app/path/page.module.css` |
 
 - **Components**: PascalCase filenames, named exports (`export function Header()`)
 - **Pages**: default export required by Next.js (`export default function Page()`)
 - **Data files**: lowercase filenames, all types exported from the same file as the data
 - **Path aliases**: always use `@/*` (maps to `src/*`), never use relative `../../` imports
+
+---
+
+## CSS Convention
+
+**No inline `style={}` attributes are allowed anywhere in the codebase.**
+
+All styling follows this priority order:
+
+1. **Tailwind utility classes** (`className="..."`) — use for all standard styling
+2. **CSS Modules** (`ComponentName.module.css`) — use when a value cannot be expressed as a static Tailwind class (e.g. values computed from props at runtime)
+3. **`globals.css`** — reserved for CSS resets and base `:root` custom properties only
+
+### CSS Module rules
+
+- One `.module.css` file per component or per page, co-located alongside it
+- Filename matches the component/page: `Sidebar.module.css` lives next to `Sidebar.tsx`
+- Use `data-*` attributes to drive state-dependent styles instead of inline `style={{}}`
+- Never use `!important`, avoid deep nesting beyond two levels
+
+```tsx
+// ✅ correct — data attribute drives the CSS rule
+<a className={styles.treeItem} data-depth={depth}>
+
+// ✅ correct — use CSS variable tokens for all colors
+<div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-5">
+
+// ❌ forbidden — no inline style attributes, no hardcoded hex colors
+<a style={{ paddingLeft: `${8 + depth * 14}px` }}>
+```
+
+```css
+/* Sidebar.module.css — data-depth drives indentation without inline styles */
+.treeItem { padding-right: 8px; }
+.treeItem[data-depth="0"] { padding-left: 8px; }
+.treeItem[data-depth="1"] { padding-left: 22px; }
+```
 
 ---
 
@@ -70,23 +109,39 @@ Append to the `technologies` array. All fields are required except `theory`, `li
 
 ## Design System
 
+### Theme System
+
+The app uses a CSS custom property token system defined in `src/app/globals.css`. Two themes are supported — **dark** (default) and **light** — toggled by setting `data-theme="dark"|"light"` on `<html>`.
+
+- `ThemeProvider` in `src/contexts/ThemeContext.tsx` manages state and persists to `localStorage`.
+- A no-flash script in `layout.tsx` reads `localStorage` before hydration to prevent the flash of wrong theme.
+- Use `useTheme()` hook from `@/contexts/ThemeContext` to read `theme` or call `toggle()`.
+
 ### Color Tokens
 
-Always use these specific values — do not introduce new background colors without updating this guide.
+**Always use these CSS variables — never hardcode hex values or Tailwind neutral/color classes for structural UI.**
 
-| Role | Value |
+| Token | Role |
 |---|---|
-| Root background | `bg-[#0a0a0a]` |
-| Card / panel background | `bg-[#0f111a]` |
-| Hover state (cards) | `bg-[#1a1c23]` |
-| Code block background | `bg-[#1e1e1e]` |
-| Border (default) | `border-neutral-800` |
-| Border (hover) | `border-neutral-500` or `border-neutral-700` |
-| Primary accent | `text-blue-400` / `bg-blue-600` |
-| Success / completion | `text-emerald-500` |
-| Body text | `text-neutral-100` |
-| Secondary text | `text-neutral-300` |
-| Muted text / labels | `text-neutral-400` / `text-neutral-500` |
+| `var(--bg-root)` | Page / outermost background |
+| `var(--bg-surface)` | Card, panel, header background |
+| `var(--bg-elevated)` | Hover state for cards, dropdown backgrounds |
+| `var(--bg-code)` | Code block / monospace areas |
+| `var(--border)` | Default border color |
+| `var(--border-hover)` | Focused or hovered border |
+| `var(--text-1)` | Primary body text |
+| `var(--text-2)` | Secondary / description text |
+| `var(--text-3)` | Muted labels, placeholders, icons |
+| `var(--accent)` | Accent background (buttons, active states) |
+| `var(--accent-hover)` | Hover state for accent buttons |
+| `var(--accent-fg)` | Accent foreground text and icons |
+| `var(--accent-subtle)` | Tinted accent background panels |
+| `var(--success)` | Success / completion color |
+| `var(--success-subtle)` | Tinted success background panels |
+| `var(--warning)` | Warning color |
+| `var(--warning-subtle)` | Tinted warning background panels |
+
+Use Tailwind's arbitrary-value syntax to apply tokens: `bg-[var(--bg-surface)]`, `text-[var(--text-2)]`, `border-[var(--border)]`.
 
 ### Typography
 

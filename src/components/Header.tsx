@@ -1,37 +1,70 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Download, Sun, Menu, Cpu } from "lucide-react";
+import { Search, Sun, Moon, Menu, Cpu } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useTheme } from "@/contexts/ThemeContext";
+import { SearchModal } from "./SearchModal";
+import styles from "./Header.module.css";
 
 export function Header() {
-  return (
-    <header className="sticky top-0 z-50 w-full border-b border-neutral-800 bg-[#0f111a]">
-      <div className="flex h-14 items-center justify-between px-6">
-        <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2">
-            <Cpu className="h-6 w-6 text-blue-500" />
-            <span className="font-semibold text-lg text-white">TechLearning</span>
-          </Link>
+  const { theme, toggle } = useTheme();
+  const [searchOpen, setSearchOpen] = useState(false);
 
-        </div>
-        
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center bg-neutral-900 border border-neutral-700 rounded-md px-3 py-1.5 text-sm text-neutral-400 w-64 hover:border-neutral-500 transition-colors cursor-pointer">
-            <Search className="w-4 h-4 mr-2" />
-            <span>Search</span>
-            <span className="ml-auto text-xs border border-neutral-700 px-1.5 rounded text-neutral-500">Ctrl+K</span>
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  return (
+    <>
+      <header className={styles.header}>
+        <div className={styles.inner}>
+          <div className={styles.left}>
+            <Link href="/" className={styles.logo}>
+              <Cpu className="h-5 w-5" />
+              <span>TechLearning</span>
+            </Link>
           </div>
-          <button className="text-neutral-400 hover:text-white hidden md:block">
-            <Sun className="w-5 h-5" />
-          </button>
-          <button className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-1.5 rounded transition-colors hidden md:block">
-            Start Learning
-          </button>
-          <button className="md:hidden text-neutral-300">
-            <Menu className="w-6 h-6" />
-          </button>
+
+          <div className={styles.right}>
+            <button
+              className={styles.searchTrigger}
+              onClick={() => setSearchOpen(true)}
+            >
+              <Search className="w-4 h-4" />
+              <span>Search</span>
+              <kbd className={styles.kbd}>Ctrl K</kbd>
+            </button>
+
+            <button
+              className={styles.iconBtn}
+              onClick={toggle}
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? (
+                <Sun className="w-4 h-4" />
+              ) : (
+                <Moon className="w-4 h-4" />
+              )}
+            </button>
+
+            <button className={styles.startBtn}>Start Learning</button>
+
+            <button className={styles.menuBtn}>
+              <Menu className="w-5 h-5" />
+            </button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+    </>
   );
 }

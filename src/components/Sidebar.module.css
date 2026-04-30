@@ -1,0 +1,9 @@
+/* Tree node indentation — driven by data-depth attribute so no inline style is needed */
+.treeItem {
+  padding-right: 8px;
+}
+
+.treeItem[data-depth="0"] { padding-left: 8px; }
+.treeItem[data-depth="1"] { padding-left: 22px; }
+.treeItem[data-depth="2"] { padding-left: 36px; }
+.treeItem[data-depth="3"] { padding-left: 50px; }
