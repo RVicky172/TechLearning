@@ -10,6 +10,11 @@ import styles from "./Header.module.css";
 export function Header() {
   const { theme, toggle } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -48,11 +53,11 @@ export function Header() {
               onClick={toggle}
               aria-label="Toggle theme"
             >
-              {theme === "dark" ? (
+              {mounted && (theme === "dark" ? (
                 <Sun className="w-4 h-4" />
               ) : (
                 <Moon className="w-4 h-4" />
-              )}
+              ))}
             </button>
 
             <button className={styles.startBtn}>Start Learning</button>
