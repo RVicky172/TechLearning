@@ -6,6 +6,7 @@ const react: Technology = {
   description: "Modern UI library for building composable, reactive web and native interfaces.",
   color: "bg-blue-500",
   iconName: "Layout",
+  deviconClass: "devicon-react-original colored",
   tree: [
     {
       id: "react-basics",

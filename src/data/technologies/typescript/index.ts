@@ -6,6 +6,7 @@ const typescript: Technology = {
   description: "Strongly typed superset of JavaScript that catches bugs at compile time and improves IDE support.",
   color: "bg-blue-700",
   iconName: "FileCode2",
+  deviconClass: "devicon-typescript-plain colored",
   tree: [
     {
       id: "ts-basics",

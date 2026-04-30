@@ -6,6 +6,7 @@ const nodejs: Technology = {
   description: "Event-driven JavaScript runtime built on Chrome's V8 engine for scalable server-side applications.",
   color: "bg-green-600",
   iconName: "Server",
+  deviconClass: "devicon-nodejs-plain colored",
   tree: [
     {
       id: "node-basics",

@@ -14,5 +14,6 @@ export type Technology = {
   description: string;
   color: string;
   iconName: string;
+  deviconClass: string;
   tree: TopicNode[];
 };

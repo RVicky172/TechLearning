@@ -30,9 +30,12 @@ export default function TechPage({ params }: { params: Promise<{ id: string }> }
         transition={{ duration: 0.5 }}
         className="mb-10"
       >
-        <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-3">
-          {tech.name} documentation
-        </h1>
+        <div className="flex items-center gap-4 mb-3">
+          <i className={`${tech.deviconClass} text-5xl md:text-6xl`} />
+          <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
+            {tech.name} documentation
+          </h1>
+        </div>
         <p className="text-lg text-neutral-400 leading-relaxed max-w-2xl">{tech.description}</p>
       </motion.div>
 

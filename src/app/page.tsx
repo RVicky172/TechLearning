@@ -47,7 +47,6 @@ export default function Home() {
         <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white tracking-tight">What do you want to learn?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {technologies.map((tech, i) => {
-            const IconComponent = (Icons as any)[tech.iconName] || Icons.Code;
             return (
               <Link href={`/tech/${tech.id}`} key={tech.id} className="block group h-full">
                 <motion.div
@@ -57,7 +56,7 @@ export default function Home() {
                   className="bg-[#0f111a] rounded-xl p-6 border border-neutral-800 transition-all duration-300 hover:border-neutral-500 hover:bg-[#1a1c23] h-full flex flex-col"
                 >
                   <div className="mb-4">
-                    <IconComponent className="w-6 h-6 text-neutral-300 group-hover:text-blue-400 transition-colors" />
+                    <i className={`${tech.deviconClass} text-4xl`} />
                   </div>
                   <h3 className="text-lg font-semibold text-neutral-100 mb-2">{tech.name}</h3>
                   <p className="text-neutral-400 text-sm leading-relaxed">

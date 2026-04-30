@@ -60,7 +60,7 @@ export function Sidebar() {
               <ArrowLeft className="w-3 h-3" /> All Technologies
             </Link>
             <div className="flex items-center gap-2">
-              {(() => { const Icon = (Icons as any)[currentTech.iconName]; return Icon ? <Icon className="w-4 h-4 text-blue-400" /> : null; })()}
+              <i className={`${currentTech.deviconClass} text-xl`} />
               <p className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">{currentTech.name}</p>
             </div>
           </div>
@@ -85,14 +85,13 @@ export function Sidebar() {
             <h4 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2 px-2">TECHNOLOGIES</h4>
             <ul className="space-y-0.5 text-sm">
               {technologies.map(tech => {
-                const Icon = (Icons as any)[tech.iconName];
                 return (
                   <li key={tech.id}>
                     <Link
                       href={`/tech/${tech.id}`}
                       className="text-neutral-300 hover:text-white flex items-center gap-2 px-2 py-1.5 rounded hover:bg-neutral-800/60 transition-colors"
                     >
-                      {Icon && <Icon className="w-4 h-4 text-neutral-500 flex-shrink-0" />}
+                      <i className={`${tech.deviconClass} text-lg flex-shrink-0`} />
                       <span className="flex-1">{tech.name}</span>
                       <ChevronRight className="h-3.5 w-3.5 opacity-40 flex-shrink-0" />
                     </Link>
