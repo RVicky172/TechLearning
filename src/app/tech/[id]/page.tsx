@@ -1,9 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { technologies, TopicNode } from "@/data/technologies";
+import { technologies } from "@/data/technologies";
+import type { TopicNode } from "@/data/types";
 import { use } from "react";
 import Link from "next/link";
+import * as Icons from "lucide-react";
 import { ExternalLink, CheckCircle, ChevronRight, BookOpen } from "lucide-react";
 
 export default function TechPage({ params }: { params: Promise<{ id: string }> }) {
@@ -88,7 +90,7 @@ export default function TechPage({ params }: { params: Promise<{ id: string }> }
               className="group block bg-[#0f111a] border border-neutral-800 hover:border-neutral-600 rounded-xl p-6 transition-all duration-200 hover:bg-[#1a1c23]"
             >
               <div className="mb-3">
-                <BookOpen className="w-5 h-5 text-neutral-500 group-hover:text-blue-400 transition-colors" />
+                {(() => { const Icon = node.iconName ? (Icons as any)[node.iconName] : BookOpen; return <Icon className="w-5 h-5 text-neutral-500 group-hover:text-blue-400 transition-colors" />; })()}
               </div>
               <h3 className="text-sm font-semibold text-neutral-100 mb-2 group-hover:text-white transition-colors">
                 {node.title}
@@ -123,7 +125,10 @@ function TopicSection({ node, index }: { node: TopicNode; index: number }) {
     >
       {/* Section header */}
       <div className="mb-7 pb-5 border-b border-neutral-800">
-        <h2 className="text-2xl font-bold text-white mb-2">{node.title}</h2>
+        <div className="flex items-center gap-3 mb-2">
+          {(() => { const Icon = node.iconName ? (Icons as any)[node.iconName] : null; return Icon ? <Icon className="w-5 h-5 text-blue-400" /> : null; })()}
+          <h2 className="text-2xl font-bold text-white">{node.title}</h2>
+        </div>
         {node.theory && (
           <p className="text-neutral-400 text-sm leading-relaxed max-w-2xl">{node.theory}</p>
         )}
@@ -152,6 +157,7 @@ function TopicSection({ node, index }: { node: TopicNode; index: number }) {
               className="bg-[#0f111a] border border-neutral-800 hover:border-neutral-700 rounded-xl p-5 transition-colors"
             >
               <h4 className="text-sm font-semibold text-neutral-100 mb-2 flex items-center gap-2">
+                {(() => { const Icon = child.iconName ? (Icons as any)[child.iconName] : null; return Icon ? <Icon className="w-3.5 h-3.5 text-neutral-500 flex-shrink-0" /> : null; })()}
                 {child.title}
                 {child.completed && <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />}
               </h4>
