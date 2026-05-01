@@ -2,10 +2,12 @@
 
 import { motion } from "framer-motion";
 import { technologies } from "@/data/technologies";
-import type { TopicNode } from "@/data/types";
-import { use, createElement, type ComponentType } from "react";
+import type { TopicNode, Technology } from "@/data/types";
+import { use, createElement, Suspense, type ComponentType } from "react";
 import * as Icons from "lucide-react";
 import { ExternalLink, CheckCircle, ChevronRight, BookOpen } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 type LucideIcon = ComponentType<{ className?: string }>;
 const iconMap = Icons as unknown as Record<string, LucideIcon | undefined>;
@@ -27,6 +29,17 @@ function DynamicIcon({
   return createElement(Icon, { className });
 }
 
+function findTopic(nodes: TopicNode[], id: string): TopicNode | null {
+  for (const node of nodes) {
+    if (node.id === id) return node;
+    if (node.children) {
+      const found = findTopic(node.children, id);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
 export default function TechPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const tech = technologies.find(t => t.id === resolvedParams.id);
@@ -34,11 +47,48 @@ export default function TechPage({ params }: { params: Promise<{ id: string }> }
   if (!tech) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <h1 className="text-2xl text-neutral-400">Technology not found.</h1>
+        <h1 className="text-2xl text-(--text-3)">Technology not found.</h1>
       </div>
     );
   }
 
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <TechPageContent tech={tech} />
+    </Suspense>
+  );
+}
+
+function TechPageContent({ tech }: { tech: Technology }) {
+  const searchParams = useSearchParams();
+  const topicId = searchParams.get("topic");
+  const selectedTopic = topicId ? findTopic(tech.tree, topicId) : null;
+
+  if (selectedTopic) {
+    return (
+      <main className="min-h-screen px-6 py-12 md:px-12 lg:px-20 max-w-6xl">
+        {/* Breadcrumb */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mb-8 flex items-center gap-2 text-sm"
+        >
+          <Link
+            href={`/tech/${tech.id}`}
+            className="text-(--text-3) hover:text-(--text-1) transition-colors"
+          >
+            {tech.name}
+          </Link>
+          <ChevronRight className="w-3.5 h-3.5 text-(--text-3)" />
+          <span className="text-(--text-1) font-medium">{selectedTopic.title}</span>
+        </motion.div>
+        <TopicSection node={selectedTopic} techId={tech.id} />
+      </main>
+    );
+  }
+
+  // ── Overview ─────────────────────────────────────────────────
   return (
     <main className="min-h-screen px-6 py-12 md:px-12 lg:px-20 max-w-6xl">
 
@@ -69,15 +119,15 @@ export default function TechPage({ params }: { params: Promise<{ id: string }> }
           <h2 className="text-2xl font-bold text-(--text-1) mb-3">
             Get started with {tech.name}
           </h2>
-          <p className="text-neutral-400 text-sm leading-relaxed mb-5">
+          <p className="text-(--text-2) text-sm leading-relaxed mb-5">
             Follow this structured learning path step by step. Each section builds on the last — track your progress topic by topic and explore curated resources.
           </p>
-          <a
-            href={`#${tech.tree[0]?.id}`}
-            className="inline-flex items-center text-sm font-medium text-(--accent-fg) hover:text-(--accent-fg) opacity-90 hover:opacity-100 transition-opacity"
+          <Link
+            href={`/tech/${tech.id}?topic=${tech.tree[0]?.id}`}
+            className="inline-flex items-center text-sm font-medium text-(--accent-fg) opacity-90 hover:opacity-100 transition-opacity"
           >
             Start learning <ChevronRight className="w-4 h-4 ml-1" />
-          </a>
+          </Link>
         </div>
 
         {/* Decorative code block */}
@@ -103,49 +153,46 @@ export default function TechPage({ params }: { params: Promise<{ id: string }> }
         <h2 className="text-2xl font-bold text-(--text-1) tracking-tight mb-6">What do you want to learn?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {tech.tree.map((node, i) => (
-            <motion.a
+            <motion.div
               key={node.id}
-              href={`#${node.id}`}
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.35, delay: 0.14 + i * 0.07 }}
-              className="group block bg-(--bg-surface) border border-(--border) hover:border-(--border-hover) rounded-xl p-6 transition-all duration-200 hover:bg-(--bg-elevated)"
             >
-              <div className="mb-3">
-                <DynamicIcon name={node.iconName} fallback={BookOpen} className="w-5 h-5 text-(--text-3) group-hover:text-(--accent-fg) transition-colors" />
-              </div>
-              <h3 className="text-sm font-semibold text-(--text-1) mb-2 group-hover:text-(--text-1) transition-colors">
-                {node.title}
-              </h3>
-              {node.theory && (
-                <p className="text-(--text-3) text-xs leading-relaxed line-clamp-3">{node.theory}</p>
-              )}
-            </motion.a>
+              <Link
+                href={`/tech/${tech.id}?topic=${node.id}`}
+                className="group block bg-(--bg-surface) border border-(--border) hover:border-(--border-hover) rounded-xl p-6 transition-all duration-200 hover:bg-(--bg-elevated) h-full"
+              >
+                <div className="mb-3">
+                  <DynamicIcon name={node.iconName} fallback={BookOpen} className="w-5 h-5 text-(--text-3) group-hover:text-(--accent-fg) transition-colors" />
+                </div>
+                <h3 className="text-sm font-semibold text-(--text-1) mb-2">
+                  {node.title}
+                </h3>
+                {node.theory && (
+                  <p className="text-(--text-3) text-xs leading-relaxed line-clamp-3">{node.theory}</p>
+                )}
+              </Link>
+            </motion.div>
           ))}
         </div>
       </motion.section>
-
-      {/* Detailed topic sections */}
-      <div className="space-y-20">
-        {tech.tree.map((node) => (
-          <TopicSection key={node.id} node={node} />
-        ))}
-      </div>
 
     </main>
   );
 }
 
-function TopicSection({ node }: { node: TopicNode }) {
+function TopicSection({ node, techId }: { node: TopicNode; techId: string }) {
+  const hasChildren = node.children && node.children.length > 0;
+
   return (
     <motion.section
       id={node.id}
       initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Section header */}
+      {/* Header */}
       <div className="mb-7 pb-5 border-b border-(--border)">
         <div className="flex items-center gap-3 mb-2">
           <DynamicIcon name={node.iconName} className="w-5 h-5 text-(--accent-fg)" />
@@ -154,12 +201,13 @@ function TopicSection({ node }: { node: TopicNode }) {
         {node.theory && (
           <p className="text-(--text-2) text-sm leading-relaxed max-w-2xl">{node.theory}</p>
         )}
-        {node.link && (
+        {/* External link — only for leaf topics (no children) */}
+        {!hasChildren && node.link && (
           <a
             href={node.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center text-xs text-(--accent-fg) hover:text-(--accent-fg) mt-3 opacity-80 hover:opacity-100 transition-opacity"
+            className="inline-flex items-center text-xs text-(--accent-fg) mt-3 opacity-80 hover:opacity-100 transition-opacity"
           >
             View resource <ExternalLink className="w-3 h-3 ml-1.5" />
           </a>
@@ -202,70 +250,55 @@ function TopicSection({ node }: { node: TopicNode }) {
         )}
       </div>
 
-      {/* Child cards — single column, full-width, spacious */}
-      {node.children && node.children.length > 0 && (
-        <div className="space-y-5">
-          {node.children.map((child, ci) => (
+      {/* Children — clickable summary cards (section view) */}
+      {hasChildren && (
+        <div className="space-y-4">
+          {node.children!.map((child, ci) => (
             <motion.div
               key={child.id}
-              id={child.id}
               initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: ci * 0.07 }}
-              className="bg-(--bg-surface) border border-(--border) hover:border-(--border-hover) rounded-xl p-7 md:p-8 transition-colors"
             >
-              <div className="flex items-center gap-3 mb-3">
-                <DynamicIcon name={child.iconName} className="w-5 h-5 text-(--text-3) shrink-0" />
-                <h4 className="text-base font-semibold text-(--text-1)">
-                  {child.title}
-                </h4>
-                {child.completed && <CheckCircle className="w-4 h-4 text-(--success) shrink-0" />}
-              </div>
-              {child.theory && (
-                <p className="text-(--text-2) text-sm leading-relaxed mb-5">{child.theory}</p>
-              )}
-              {(child.theoryDetail?.keyConcepts || child.theoryDetail?.commonPitfalls) && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-                  {child.theoryDetail?.keyConcepts && child.theoryDetail.keyConcepts.length > 0 && (
-                    <div className="bg-(--accent-subtle) border border-(--accent-subtle) rounded-lg p-4">
-                      <span className="text-xs font-semibold text-(--accent-fg) uppercase tracking-wider">Key Concepts</span>
-                      <ul className="mt-3 space-y-2.5">
-                        {child.theoryDetail.keyConcepts.map((c, i) => (
-                          <li key={i} className="text-sm text-(--text-2) flex items-start gap-2 leading-relaxed">
-                            <span className="text-(--accent-fg) mt-1 shrink-0">•</span>
-                            {c}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {child.theoryDetail?.commonPitfalls && child.theoryDetail.commonPitfalls.length > 0 && (
-                    <div className="bg-(--warning-subtle) border border-(--warning-subtle) rounded-lg p-4">
-                      <span className="text-xs font-semibold text-(--warning) uppercase tracking-wider">Common Pitfalls</span>
-                      <ul className="mt-3 space-y-2.5">
-                        {child.theoryDetail.commonPitfalls.map((p, i) => (
-                          <li key={i} className="text-sm text-(--text-2) flex items-start gap-2 leading-relaxed">
-                            <span className="text-(--warning) mt-1 shrink-0">⚠</span>
-                            {p}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+              <Link
+                href={`/tech/${techId}?topic=${child.id}`}
+                className="group flex items-start gap-4 bg-(--bg-surface) border border-(--border) hover:border-(--border-hover) rounded-xl p-6 md:p-7 transition-colors"
+              >
+                <div className="shrink-0 mt-0.5">
+                  <DynamicIcon name={child.iconName} className="w-5 h-5 text-(--text-3) group-hover:text-(--accent-fg) transition-colors" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <h4 className="text-base font-semibold text-(--text-1)">{child.title}</h4>
+                    {child.completed && <CheckCircle className="w-4 h-4 text-(--success) shrink-0" />}
+                  </div>
+                  {child.theory && (
+                    <p className="text-(--text-2) text-sm leading-relaxed line-clamp-2">{child.theory}</p>
                   )}
                 </div>
-              )}
-              {child.link && (
-                <a
-                  href={child.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center text-sm text-(--accent-fg) hover:text-(--accent-fg) opacity-80 hover:opacity-100 transition-opacity"
-                >
-                  Study material <ExternalLink className="w-3.5 h-3.5 ml-1.5" />
-                </a>
-              )}
+                <ChevronRight className="shrink-0 w-4 h-4 text-(--text-3) group-hover:text-(--accent-fg) transition-colors mt-1" />
+              </Link>
             </motion.div>
+          ))}
+        </div>
+      )}
+
+      {/* Examples — only for leaf topics (no children) */}
+      {!hasChildren && node.theoryDetail?.examples && node.theoryDetail.examples.length > 0 && (
+        <div className="mt-8 space-y-5">
+          <h3 className="text-lg font-semibold text-(--text-1)">Examples</h3>
+          {node.theoryDetail.examples.map((example, i) => (
+            <div key={i} className="bg-(--bg-surface) border border-(--border) rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-(--border)">
+                <h4 className="text-sm font-semibold text-(--text-1)">{example.title}</h4>
+                {example.description && (
+                  <p className="text-xs text-(--text-2) mt-1 leading-relaxed">{example.description}</p>
+                )}
+              </div>
+              <pre className="bg-(--bg-code) p-5 overflow-x-auto text-xs leading-relaxed">
+                <code className="text-(--text-2)">{example.code}</code>
+              </pre>
+            </div>
           ))}
         </div>
       )}

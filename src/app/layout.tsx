@@ -31,6 +31,7 @@ export default function RootLayout({
       data-theme="dark"
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <head>
         {/* No-flash script: reads localStorage before React hydrates */}

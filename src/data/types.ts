@@ -2,6 +2,12 @@ export type TheoryDetail = {
   keyConcepts?: string[];
   whyItMatters?: string;
   commonPitfalls?: string[];
+  examples?: Array<{
+    title: string;
+    description: string;
+    code: string;
+    language?: string;
+  }>;
 };
 
 export type TopicNode = {

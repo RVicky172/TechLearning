@@ -16,30 +16,39 @@ function SidebarIcon({ name, className }: { name: string; className: string }) {
   if (!Icon) return null;
   return createElement(Icon, { className });
 }
-function SidebarTreeNode({ node, depth = 0 }: { node: TopicNode; depth?: number }) {
+function SidebarTreeNode({ node, depth = 0, techId }: { node: TopicNode; depth?: number; techId: string }) {
   const [open, setOpen] = useState(depth === 0);
   const hasChildren = node.children && node.children.length > 0;
 
   return (
     <li>
-      <a
-        href={`#${node.id}`}
-        onClick={() => hasChildren && setOpen(o => !o)}
-        className={`w-full text-left flex items-center gap-2 py-1.5 rounded text-sm transition-colors text-(--text-2) hover:text-(--text-1) hover:bg-(--bg-elevated) ${styles.treeItem}`}
+      <div
+        className={`flex items-center gap-2 rounded transition-colors hover:bg-(--bg-elevated) ${styles.treeItem}`}
         data-depth={depth}
       >
-        {node.iconName && <SidebarIcon name={node.iconName} className="w-3.5 h-3.5 shrink-0 text-(--text-3)" />}
-        <span className="truncate flex-1">{node.title}</span>
+        <Link
+          href={`/tech/${techId}?topic=${node.id}`}
+          className="flex-1 flex items-center gap-2 py-1.5 text-sm text-(--text-2) hover:text-(--text-1) transition-colors min-w-0"
+        >
+          {node.iconName && <SidebarIcon name={node.iconName} className="w-3.5 h-3.5 shrink-0 text-(--text-3)" />}
+          <span className="truncate">{node.title}</span>
+        </Link>
         {hasChildren && (
-          open
-            ? <ChevronDown className="w-3.5 h-3.5 shrink-0 text-(--text-3)" />
-            : <ChevronRight className="w-3.5 h-3.5 shrink-0 text-(--text-3)" />
+          <button
+            onClick={() => setOpen(o => !o)}
+            className="shrink-0 p-1 text-(--text-3) hover:text-(--text-1) transition-colors"
+            aria-label={open ? "Collapse" : "Expand"}
+          >
+            {open
+              ? <ChevronDown className="w-3.5 h-3.5" />
+              : <ChevronRight className="w-3.5 h-3.5" />}
+          </button>
         )}
-      </a>
+      </div>
       {hasChildren && open && (
         <ul>
           {node.children!.map(child => (
-            <SidebarTreeNode key={child.id} node={child} depth={depth + 1} />
+            <SidebarTreeNode key={child.id} node={child} depth={depth + 1} techId={techId} />
           ))}
         </ul>
       )}
@@ -80,7 +89,7 @@ export function Sidebar() {
               </Link>
             </li>
             {currentTech.tree.map(node => (
-              <SidebarTreeNode key={node.id} node={node} depth={0} />
+              <SidebarTreeNode key={node.id} node={node} depth={0} techId={currentTechId!} />
             ))}
           </ul>
         </div>
