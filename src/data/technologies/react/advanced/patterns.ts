@@ -3,7 +3,7 @@ import type { TopicNode } from "@/data/types";
 export const patterns: TopicNode = {
   id: "react-patterns",
   title: "Component Patterns",
-  iconName: "PuzzlePiece",
+  iconName: "Puzzle",
   link: "https://react.dev/learn/reusing-logic-with-custom-hooks",
   theory:
     "Advanced patterns for sharing logic and building flexible components. Custom hooks encapsulate stateful logic and make it reusable. Compound components use Context to share implicit state for flexible composition. The 'as' prop pattern lets consumers control which HTML element is rendered.",

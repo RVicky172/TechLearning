@@ -18,7 +18,7 @@ export const query: TopicNode = {
       "Server state is different from UI state — it's remote, can change on the server, may become stale, and requires synchronization. TanStack Query manages this complexity with minimal code, supporting loading states, errors, stale states, and refetching automatically.",
     commonPitfalls: [
       "Using the same queryKey for different data — keys must uniquely identify the data for proper caching",
-      "Not setting staleTime causing over-fetching on every component mount — data becomes stale immediately",
+      "Not setting staleTime causing over-fetching on every component mount — without it data is immediately stale and refetched on each mount",
       "Invalidating too broadly after mutations causing unrelated queries to refetch unnecessarily",
       "Using TanStack Query for client state — use useState or Zustand instead",
     ],
@@ -48,10 +48,10 @@ function UserProfile({ userId }) {
   const { data: posts } = useQuery({
     queryKey: ['posts'],
     queryFn: () => fetch('/api/posts').then(r => r.json()),
-    staleTime: 5 * 60 * 1000,      // Data fresh for 5 minutes
-    cacheTime: 30 * 60 * 1000,     // Keep in cache 30 minutes
-    refetchOnWindowFocus: false,    // Don't refetch when tab refocuses
-    retry: 2,                        // Retry failed requests twice
+    staleTime: 5 * 60 * 1000,      // Data fresh for 5 minutes (no refetch)
+    gcTime:    30 * 60 * 1000,     // Keep in cache 30 min after last consumer unmounts
+    refetchOnWindowFocus: false,    // Don't refetch when tab regains focus
+    retry: 2,                       // Retry failed requests twice before erroring
   });
   
   return <ul>{posts?.map(p => <li key={p.id}>{p.title}</li>)}</ul>;

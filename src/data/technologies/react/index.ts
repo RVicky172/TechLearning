@@ -2,6 +2,8 @@ import type { Technology } from "@/data/types";
 import { reactBasics } from "./basics/index";
 import { reactAdvanced } from "./advanced/index";
 import { reactEcosystem } from "./ecosystem/index";
+import { reactHooks } from "./hooks/index";
+import { reactPatterns } from "./patterns/index";
 
 const react: Technology = {
   id: "react",
@@ -10,7 +12,7 @@ const react: Technology = {
   color: "bg-blue-500",
   iconName: "Layout",
   deviconClass: "devicon-react-original colored",
-  tree: [reactBasics, reactAdvanced, reactEcosystem],
+  tree: [reactBasics, reactHooks, reactAdvanced, reactPatterns, reactEcosystem],
 };
 
 export default react;

@@ -32,7 +32,7 @@ export default function Home() {
           <div className="flex items-center justify-between border-b border-neutral-700 pb-2 mb-2">
             <span className="text-xs text-(--text-3) flex items-center"><Icons.Terminal className="w-3 h-3 mr-2"/> Setup.tsx</span>
           </div>
-          <div className="text-sm text-(--text-2) font-mono space-y-2">
+          <div className="text-sm text-(--text-code) font-mono space-y-2">
              <div><span className="text-(--accent-fg)">const</span> path = <span className="text-green-400">&quot;Mastery&quot;</span>;</div>
              <div><span className="text-(--accent-fg)">await</span> ai.teach(path);</div>
           </div>

@@ -3,6 +3,15 @@ import { components } from "./components";
 import { props } from "./props";
 import { state } from "./state";
 import { events } from "./events";
+import { conditionalRendering } from "./conditionalRendering";
+import { listsAndKeys } from "./listsAndKeys";
+import { forms } from "./forms";
+import { propsDrilling } from "./propsDrilling";
+import { lifecycleMethods } from "./lifecycleMethods";
+import { virtualDom } from "./virtualDom";
+import { diffing } from "./diffing";
+import { renderPipeline } from "./renderPipeline";
+import { hydration } from "./hydration";
 
 export const reactBasics: TopicNode = {
   id: "react-basics",
@@ -64,5 +73,19 @@ function Footer() {
       },
     ],
   },
-  children: [components, props, state, events],
+  children: [
+    components,
+    props,
+    state,
+    virtualDom,
+    diffing,
+    renderPipeline,
+    hydration,
+    events,
+    conditionalRendering,
+    listsAndKeys,
+    forms,
+    propsDrilling,
+    lifecycleMethods,
+  ],
 };

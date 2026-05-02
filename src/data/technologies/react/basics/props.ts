@@ -24,64 +24,90 @@ export const props: TopicNode = {
     ],
     examples: [
       {
-        title: "Basic Props Passing",
-        description: "Pass data from parent to child via props.",
-        code: `function Parent() {
-  return <Child name="Alice" age={30} />;
+        title: "Typed props with destructuring",
+        description: "Destructure all props in the signature. Default values document intent and prevent undefined errors.",
+        code: `function StatusBadge({ label, variant = 'info', size = 'md' }) {
+  const variantClass = {
+    info:    'badge-info',
+    success: 'badge-success',
+    warning: 'badge-warning',
+    error:   'badge-error',
+  }[variant] ?? 'badge-info';
+
+  return (
+    <span className={\`badge \${variantClass} badge-\${size}\`}>
+      {label}
+    </span>
+  );
 }
 
-function Child({ name, age }) {
-  return <p>{name} is {age} years old</p>;
-}`,
+// Consumers only need to supply what differs from the default
+<StatusBadge label="Active" variant="success" />
+<StatusBadge label="Deprecated" variant="warning" size="sm" />`,
         language: "jsx",
       },
       {
-        title: "Props with Default Values",
-        description: "Use default parameters to provide fallback values.",
-        code: `function UserCard({ name = "Guest", role = "User" }) {
+        title: "children and slot props — flexible composition",
+        description: "Use children for main content and named slot props for optional regions like header and footer.",
+        code: `function Card({ header, footer, children }) {
   return (
-    <div>
-      <h3>{name}</h3>
-      <p>Role: {role}</p>
+    <div className="card">
+      {header && <div className="card-header">{header}</div>}
+      <div className="card-body">{children}</div>
+      {footer && <div className="card-footer">{footer}</div>}
     </div>
   );
 }
 
-// Call with some or all props
-<UserCard />  // Uses defaults
-<UserCard name="Bob" />  // name from props, role defaults`,
+// Full usage
+<Card
+  header={<h2>Monthly Report</h2>}
+  footer={<button>Download PDF</button>}
+>
+  <ReportChart />
+  <ReportTable />
+</Card>
+
+// Body-only usage
+<Card>
+  <p>Simple note with no header or footer.</p>
+</Card>`,
         language: "jsx",
       },
       {
-        title: "Children Prop",
-        description: "The children prop lets you pass JSX elements as content.",
-        code: `function Container({ children, title }) {
+        title: "Lifting state up — callback props",
+        description: "Child emits events via callback props; parent owns state. This keeps data flow predictable.",
+        code: `function QuantitySelector({ value, min = 1, max = 99, onChange }) {
   return (
-    <div style={{border: '1px solid blue', padding: '10px'}}>
-      <h2>{title}</h2>
-      {children}
+    <div className="qty-selector">
+      <button
+        onClick={() => onChange(Math.max(min, value - 1))}
+        disabled={value <= min}
+      >
+        −
+      </button>
+      <span>{value}</span>
+      <button
+        onClick={() => onChange(Math.min(max, value + 1))}
+        disabled={value >= max}
+      >
+        +
+      </button>
     </div>
   );
 }
 
-// Usage
-<Container title="My Content">
-  <p>This paragraph is passed as children</p>
-  <button>Click me</button>
-</Container>`,
-        language: "jsx",
-      },
-      {
-        title: "Event Handler Props",
-        description: "Pass functions as props to handle child events.",
-        code: `function Parent() {
-  const handleClick = () => console.log("Button clicked!");
-  
-  return <Child onButtonClick={handleClick} />;
-}
+function CartItem({ product }) {
+  const [qty, setQty] = useState(1);
+  const total = product.price * qty;
 
-function Child({ onButtonClick }) {
-  return <button onClick={onButtonClick}>Click</button>;
+  return (
+    <div className="cart-item">
+      <p>{product.name}</p>
+      <QuantitySelector value={qty} onChange={setQty} max={product.stock} />
+      <p>Total: \${total.toFixed(2)}</p>
+    </div>
+  );
 }`,
         language: "jsx",
       },

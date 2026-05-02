@@ -1,76 +1,151 @@
 # React Technology Data
 
-This folder contains all learning content for the **React** technology, organised into topic-scoped subfolders so each file stays small and focused.
+This folder contains all learning content for the React technology. Content is split by section so each topic stays small, focused, and easy to maintain.
 
-## Folder Structure
+## Current Structure
 
 ```text
 react/
-├── index.ts              ← Entry point. Assembles the full Technology object.
+├── index.ts
+├── README.md
 │
-├── basics/               ← "Basics of React" section
-│   ├── index.ts          ← Assembles reactBasics TopicNode from child files
-│   ├── components.ts     ← Components & JSX
-│   ├── props.ts          ← Props & Data Flow
-│   ├── state.ts          ← State & Hooks
-│   └── events.ts         ← Event Handling
+├── basics/
+│   ├── index.ts
+│   ├── components.ts
+│   ├── props.ts
+│   ├── state.ts
+│   ├── virtualDom.ts
+│   ├── diffing.ts
+│   ├── renderPipeline.ts
+│   ├── hydration.ts
+│   ├── events.ts
+│   ├── conditionalRendering.ts
+│   ├── listsAndKeys.ts
+│   ├── forms.ts
+│   ├── propsDrilling.ts
+│   └── lifecycleMethods.ts
 │
-├── advanced/             ← "Advanced Concepts" section
-│   ├── index.ts          ← Assembles reactAdvanced TopicNode from child files
-│   ├── context.ts        ← Context API
-│   ├── effects.ts        ← useEffect & Side Effects
-│   ├── performance.ts    ← Performance Optimization
-│   └── patterns.ts       ← Component Patterns
+├── hooks/
+│   ├── index.ts
+│   ├── useState.ts
+│   ├── useReducer.ts
+│   ├── useRef.ts
+│   ├── useMemoCallback.ts
+│   ├── useContext.ts
+│   ├── useEffect.ts
+│   ├── effectAlternatives.ts
+│   ├── useLayoutEffect.ts
+│   ├── useTransition.ts
+│   └── custom.ts
 │
-└── ecosystem/            ← "React Ecosystem" section
-    ├── index.ts          ← Assembles reactEcosystem TopicNode from child files
-    ├── routing.ts        ← Routing with Next.js
-    └── query.ts          ← Data Fetching & Caching (TanStack Query)
+├── advanced/
+│   ├── index.ts
+│   ├── context.ts
+│   ├── stateStrategy.ts
+│   ├── effects.ts
+│   ├── performance.ts
+│   ├── virtualization.ts
+│   └── patterns.ts
+│
+├── patterns/
+│   ├── index.ts
+│   ├── errorBoundaries.ts
+│   ├── testing.ts
+│   ├── forwardRef.ts
+│   ├── hoc.ts
+│   ├── lazyLoading.ts
+│   ├── portals.ts
+│   └── renderProps.ts
+│
+└── ecosystem/
+    ├── index.ts
+    ├── routing.ts
+    ├── serverClientBoundaries.ts
+    └── query.ts
 ```
+
+## Section Inventory
+
+Top-level order in `react/index.ts`:
+
+1. Basics of React
+2. React Hooks
+3. Advanced Concepts
+4. Patterns & Techniques
+5. React Ecosystem
+
+### Basics of React
+
+- Components & JSX
+- Props & Data Flow
+- State & Hooks
+- Virtual DOM
+- Diffing & Reconciliation
+- Render, Reconciliation, Commit
+- Hydration
+- Event Handling
+- Conditional Rendering
+- Lists & Keys
+- Forms & Controlled Inputs
+- Props Drilling
+- Lifecycle Methods (Class Components)
+
+### React Hooks
+
+- useState
+- useReducer
+- useRef
+- useMemo & useCallback
+- useContext
+- useEffect
+- You Might Not Need an Effect
+- useLayoutEffect
+- useTransition & useDeferredValue
+- Custom Hooks
+
+### Advanced Concepts
+
+- Context API
+- State Management Strategy
+- useEffect & Side Effects
+- Performance Optimization
+- List Virtualization
+- Component Patterns
+
+### Patterns & Techniques
+
+- Error Boundaries
+- forwardRef
+- Higher-Order Components
+- Lazy Loading & Suspense
+- Testing React Behavior
+- Portals
+- Render Props
+
+### React Ecosystem
+
+- Routing with Next.js
+- Server vs Client Components
+- Data Fetching & Caching
 
 ## How It Works
 
-Each **topic file** (e.g. `basics/state.ts`) exports a single named `TopicNode` constant:
-
-```ts
-import type { TopicNode } from "@/data/types";
-
-export const state: TopicNode = {
-  id: "react-state",
-  title: "State & Hooks",
-  // ...theory, theoryDetail, examples
-};
-```
-
-Each **section assembler** (e.g. `basics/index.ts`) imports the topic files and wires them into a parent `TopicNode`:
-
-```ts
-import { components } from "./components";
-import { props }      from "./props";
-import { state }      from "./state";
-import { events }     from "./events";
-
-export const reactBasics: TopicNode = {
-  id: "react-basics",
-  title: "Basics of React",
-  children: [components, props, state, events],
-};
-```
-
-The top-level **`index.ts`** combines all three sections into the final `Technology` object consumed by the app.
+- Each topic file exports one named `TopicNode`.
+- Each section `index.ts` assembles a parent `TopicNode` with a `children` array.
+- `react/index.ts` assembles the final `Technology` object consumed by the app.
 
 ## Adding a New Topic
 
-1. Create a new file inside the relevant section folder, e.g. `basics/refs.ts`.
-2. Export a named `TopicNode` constant from it.
-3. Import it in the section's `index.ts` and add it to the `children` array.
+1. Create a topic file in the correct section folder.
+2. Export a named `TopicNode` from that file.
+3. Import it in the section `index.ts`.
+4. Add it to the section `children` array in the intended order.
+5. Update this README section inventory.
 
 ## Types Reference
 
-All types live in [`src/data/types.ts`](../../types.ts):
+Types are defined in `src/data/types.ts`.
 
-| Type            | Purpose                                         |
-|-----------------|-------------------------------------------------|
-| `Technology`    | Top-level object for a technology (React, TS…)  |
-| `TopicNode`     | A single node in the learning tree              |
-| `TheoryDetail`  | Rich detail: keyConcepts, pitfalls, examples    |
+- `Technology`: top-level object for a technology.
+- `TopicNode`: a node in the learning tree.
+- `TheoryDetail`: key concepts, why it matters, pitfalls, and examples.

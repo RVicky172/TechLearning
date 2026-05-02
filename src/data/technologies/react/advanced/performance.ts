@@ -77,51 +77,80 @@ function DataAnalyzer({ data }) {
       },
       {
         title: "useCallback for Stable Function References",
-        description: "Pass stable function references to memoized children.",
-        code: `import { useCallback, memo } from 'react';
+        description: "Pass stable function references to memoized children. Avoid creating new inline arrows in JSX — they defeat the memoization.",
+        code: `import { useCallback, memo, useState } from 'react';
 
-const Button = memo(({ onClick, label }) => {
-  console.log('Button rendered');
-  return <button onClick={onClick}>{label}</button>;
+type RowProps = { item: { id: number; name: string }; onDelete: (id: number) => void };
+
+const TableRow = memo(function TableRow({ item, onDelete }: RowProps) {
+  console.log('TableRow rendered:', item.id);
+  return (
+    <tr>
+      <td>{item.name}</td>
+      <td>
+        {/* ✅ onDelete is stable, so clicking Delete won't cause all rows to re-render */}
+        <button onClick={() => onDelete(item.id)}>Delete</button>
+      </td>
+    </tr>
+  );
 });
 
-function Parent({ userId }) {
-  // Without useCallback, Button would re-render on every Parent render
-  const handleDelete = useCallback((id) => {
-    console.log('Deleting:', id);
-  }, []);  // This function is created once and reused
-  
-  const handleEdit = useCallback((id) => {
-    console.log('Editing:', id);
-  }, [userId]);  // Recreate if userId changes
-  
+function DataTable({ items }) {
+  const [selected, setSelected] = useState<number | null>(null);
+
+  // ✅ Stable reference — created once, not on every render
+  const handleDelete = useCallback((id: number) => {
+    console.log('Delete', id);
+  }, []); // empty deps: no external values captured
+
+  // ❌ Anti-pattern: passing a new arrow function defeats memo
+  // const handleDelete = (id) => deleteItem(id); // recreated every render
+
   return (
-    <div>
-      <Button onClick={() => handleDelete(userId)} label="Delete" />
-      <Button onClick={() => handleEdit(userId)} label="Edit" />
-    </div>
+    <table>
+      <tbody>
+        {items.map(item => (
+          <TableRow key={item.id} item={item} onDelete={handleDelete} />
+        ))}
+      </tbody>
+    </table>
   );
 }`,
-        language: "jsx",
+        language: "tsx",
       },
       {
-        title: "Profiling with React DevTools",
-        description: "Use React DevTools Profiler to identify performance bottlenecks.",
-        code: `// Steps:
-// 1. Install React DevTools browser extension
-// 2. Open your app in the browser
-// 3. Go to DevTools > Profiler tab
-// 4. Click record and interact with your app
-// 5. Stop recording and analyze which components re-rendered
-// 6. Check the timeline to see which renders took longest
+        title: "Profiling with the React Profiler API",
+        description: "Wrap a subtree with <Profiler> to measure render time programmatically and log slow renders.",
+        code: `import { Profiler } from 'react';
 
-// Look for:
-// - Unnecessary re-renders (component rendered but props didn't change)
-// - Slow renders (taking > 16ms for 60fps)
-// - Components rendering together that could be split
+function onRenderCallback(
+  id: string,            // the Profiler id prop
+  phase: 'mount' | 'update' | 'nested-update',
+  actualDuration: number // time spent rendering
+) {
+  // Log to your observability backend or console
+  if (actualDuration > 16) {
+    // Anything above 16ms risks dropping a frame at 60 fps
+    console.warn(\`[Profiler] \${id} took \${actualDuration.toFixed(1)}ms (\${phase})\`);
+  }
+}
 
-// Then apply targeted optimizations like memo, useMemo, useCallback`,
-        language: "javascript",
+function App() {
+  return (
+    <Profiler id="ProductList" onRender={onRenderCallback}>
+      <ProductList />
+    </Profiler>
+  );
+}
+
+// Browser DevTools workflow:
+// 1. Install React DevTools extension
+// 2. Open DevTools > Profiler tab
+// 3. Click record, interact with the app, stop recording
+// 4. Inspect the flame graph: grey = not rendered, colours = render cost
+// 5. Sort by "Self time" to find the most expensive components
+// 6. Look for components rendering when props/state didn't change (memo candidates)`,
+        language: "tsx",
       },
     ],
   },

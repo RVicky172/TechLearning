@@ -24,14 +24,26 @@ export const events: TopicNode = {
     ],
     examples: [
       {
-        title: "Button Click Handler",
-        description: "Respond to a click event.",
-        code: `function Button() {
-  const handleClick = () => {
-    console.log('Button clicked!');
+        title: "Button with loading state — async event handler",
+        description: "A realistic click handler that disables the button during an async operation and handles errors.",
+        code: `function SaveButton({ onSave }) {
+  const [status, setStatus] = useState('idle'); // 'idle' | 'saving' | 'error'
+
+  const handleClick = async () => {
+    setStatus('saving');
+    try {
+      await onSave();
+      setStatus('idle');
+    } catch {
+      setStatus('error');
+    }
   };
-  
-  return <button onClick={handleClick}>Click me</button>;
+
+  return (
+    <button onClick={handleClick} disabled={status === 'saving'}>
+      {status === 'saving' ? 'Saving\u2026' : status === 'error' ? 'Retry' : 'Save'}
+    </button>
+  );
 }`,
         language: "jsx",
       },
@@ -74,48 +86,50 @@ export const events: TopicNode = {
         language: "jsx",
       },
       {
-        title: "Multiple Event Handlers",
-        description: "Handle multiple events on the same element.",
-        code: `function Input() {
-  const handleChange = (e) => {
-    console.log('Value changed:', e.target.value);
+        title: "Keyboard events — onKeyDown",
+        description: "Handle keyboard shortcuts and navigate lists accessibly with onKeyDown.",
+        code: `function SearchInput({ onSearch }) {
+  const [query, setQuery] = useState('');
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      onSearch(query);
+    }
+    if (e.key === 'Escape') {
+      setQuery('');
+    }
   };
-  
-  const handleFocus = () => {
-    console.log('Input focused');
-  };
-  
-  const handleBlur = () => {
-    console.log('Input blurred');
-  };
-  
+
   return (
     <input
-      onChange={handleChange}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
+      type="search"
+      value={query}
+      placeholder="Press Enter to search, Esc to clear"
+      onChange={e => setQuery(e.target.value)}
+      onKeyDown={handleKeyDown}
     />
   );
 }`,
         language: "jsx",
       },
       {
-        title: "Event Delegation",
-        description: "Handle events from multiple child elements.",
-        code: `function List() {
-  const handleItemClick = (e) => {
-    // e.target is the clicked element
-    if (e.target.dataset.id) {
-      console.log('Clicked item:', e.target.dataset.id);
-    }
-  };
-  
+        title: "Stopping propagation",
+        description: "Use e.stopPropagation() to prevent a child event from triggering a parent handler.",
+        code: `function SelectableCard({ id, onSelect, children }) {
   return (
-    <ul onClick={handleItemClick}>
-      <li data-id="1">Item 1</li>
-      <li data-id="2">Item 2</li>
-      <li data-id="3">Item 3</li>
-    </ul>
+    <div className="card" onClick={() => onSelect(id)}>
+      {children}
+
+      {/* Without stopPropagation, clicking Delete would also fire onSelect */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleDelete(id);
+        }}
+      >
+        Delete
+      </button>
+    </div>
   );
 }`,
         language: "jsx",

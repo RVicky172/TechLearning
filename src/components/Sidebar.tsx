@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ChevronDown, ChevronRight, ArrowLeft } from "lucide-react";
 import * as Icons from "lucide-react";
 import { technologies } from "@/data/technologies";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useState, createElement, type ComponentType } from "react";
 import type { TopicNode } from "@/data/types";
 import styles from "./Sidebar.module.css";
@@ -16,19 +16,20 @@ function SidebarIcon({ name, className }: { name: string; className: string }) {
   if (!Icon) return null;
   return createElement(Icon, { className });
 }
-function SidebarTreeNode({ node, depth = 0, techId }: { node: TopicNode; depth?: number; techId: string }) {
+function SidebarTreeNode({ node, depth = 0, techId, activeTopic }: { node: TopicNode; depth?: number; techId: string; activeTopic: string | null }) {
+  const isActive = node.id === activeTopic;
   const [open, setOpen] = useState(depth === 0);
   const hasChildren = node.children && node.children.length > 0;
 
   return (
     <li>
       <div
-        className={`flex items-center gap-2 rounded transition-colors hover:bg-(--bg-elevated) ${styles.treeItem}`}
+        className={`flex items-center gap-2 rounded transition-colors ${isActive ? styles.treeItemActive : "hover:bg-(--bg-elevated)"} ${styles.treeItem}`}
         data-depth={depth}
       >
         <Link
           href={`/tech/${techId}?topic=${node.id}`}
-          className="flex-1 flex items-center gap-2 py-1.5 text-sm text-(--text-2) hover:text-(--text-1) transition-colors min-w-0"
+          className={`flex-1 flex items-center gap-2 py-1.5 text-sm transition-colors min-w-0 ${isActive ? "text-(--accent-fg) font-medium" : "text-(--text-2) hover:text-(--text-1)"}`}
         >
           {node.iconName && <SidebarIcon name={node.iconName} className="w-3.5 h-3.5 shrink-0 text-(--text-3)" />}
           <span className="truncate">{node.title}</span>
@@ -48,7 +49,7 @@ function SidebarTreeNode({ node, depth = 0, techId }: { node: TopicNode; depth?:
       {hasChildren && open && (
         <ul>
           {node.children!.map(child => (
-            <SidebarTreeNode key={child.id} node={child} depth={depth + 1} techId={techId} />
+            <SidebarTreeNode key={child.id} node={child} depth={depth + 1} techId={techId} activeTopic={activeTopic} />
           ))}
         </ul>
       )}
@@ -58,12 +59,14 @@ function SidebarTreeNode({ node, depth = 0, techId }: { node: TopicNode; depth?:
 
 export function Sidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const activeTopic = searchParams.get("topic");
   const techMatch = pathname.match(/^\/tech\/([^/]+)/);
   const currentTechId = techMatch?.[1];
   const currentTech = currentTechId ? technologies.find(t => t.id === currentTechId) : null;
 
   return (
-    <aside className="fixed left-0 top-14 z-40 hidden h-[calc(100vh-3.5rem)] w-64 md:block overflow-y-auto border-r border-(--border) bg-(--bg-root) py-5 px-2">
+    <aside className="sidebar-scroll fixed left-0 top-14 z-40 hidden h-[calc(100vh-3.5rem)] w-64 md:block overflow-y-auto border-r border-(--border) bg-(--bg-root) py-5 px-2">
       {currentTech ? (
         <div>
           <div className="px-2 mb-4">
@@ -89,7 +92,7 @@ export function Sidebar() {
               </Link>
             </li>
             {currentTech.tree.map(node => (
-              <SidebarTreeNode key={node.id} node={node} depth={0} techId={currentTechId!} />
+              <SidebarTreeNode key={node.id} node={node} depth={0} techId={currentTechId!} activeTopic={activeTopic} />
             ))}
           </ul>
         </div>

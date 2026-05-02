@@ -1,7 +1,9 @@
 import type { TopicNode } from "@/data/types";
 import { context } from "./context";
+import { stateStrategy } from "./stateStrategy";
 import { effects } from "./effects";
 import { performance } from "./performance";
+import { virtualization } from "./virtualization";
 import { patterns } from "./patterns";
 
 export const reactAdvanced: TopicNode = {
@@ -26,5 +28,5 @@ export const reactAdvanced: TopicNode = {
       "Creating too many custom hooks too early — let the pattern emerge naturally before abstracting",
     ],
   },
-  children: [context, effects, performance, patterns],
+  children: [context, stateStrategy, effects, performance, virtualization, patterns],
 };

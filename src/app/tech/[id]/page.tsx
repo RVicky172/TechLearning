@@ -8,6 +8,7 @@ import * as Icons from "lucide-react";
 import { ExternalLink, CheckCircle, ChevronRight, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { CodeBlock } from "@/components/CodeBlock";
 
 type LucideIcon = ComponentType<{ className?: string }>;
 const iconMap = Icons as unknown as Record<string, LucideIcon | undefined>;
@@ -133,7 +134,7 @@ function TechPageContent({ tech }: { tech: Technology }) {
         {/* Decorative code block */}
         <div className="shrink-0 bg-(--bg-code) rounded-xl border border-(--border) p-5 font-mono text-xs w-full md:w-60 shadow-2xl">
           <div className="text-(--text-3) text-[10px] uppercase tracking-wider mb-3">learning-path.ts</div>
-          <div className="space-y-2 text-(--text-2)">
+          <div className="space-y-2 text-(--text-code)">
             <div><span className="text-(--accent-fg)">const</span> path = <span className="text-green-400">&quot;{tech.name}&quot;</span>;</div>
             <div><span className="text-(--accent-fg)">await</span> <span className="text-yellow-300">learn</span>(path);</div>
             <div className="text-emerald-400">{"// ✓ Mastery unlocked"}</div>
@@ -215,30 +216,30 @@ function TopicSection({ node, techId }: { node: TopicNode; techId: string }) {
         {node.theoryDetail && (
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-5">
             {node.theoryDetail.keyConcepts && node.theoryDetail.keyConcepts.length > 0 && (
-              <div className="bg-(--accent-subtle) border border-(--accent-subtle) rounded-xl p-5 md:p-6">
+              <div className="min-w-0 bg-(--accent-subtle) border border-(--accent-subtle) rounded-xl p-5 md:p-6">
                 <h4 className="text-xs font-semibold text-(--accent-fg) uppercase tracking-wider mb-4">Key Concepts</h4>
                 <ul className="space-y-3">
                   {node.theoryDetail.keyConcepts.map((c, i) => (
-                    <li key={i} className="text-sm text-(--text-2) flex items-start gap-2 leading-relaxed">
+                    <li key={i} className="min-w-0 text-sm text-(--text-2) flex items-start gap-2 leading-relaxed">
                       <span className="text-(--accent-fg) mt-1 shrink-0">•</span>
-                      {c}
+                      <span className="min-w-0 flex-1 wrap-anywhere whitespace-normal">{c}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             )}
             {node.theoryDetail.whyItMatters && (
-              <div className="bg-(--success-subtle) border border-(--success-subtle) rounded-xl p-5 md:p-6">
+              <div className="min-w-0 bg-(--success-subtle) border border-(--success-subtle) rounded-xl p-5 md:p-6">
                 <h4 className="text-xs font-semibold text-(--success) uppercase tracking-wider mb-4">Why it Matters</h4>
-                <p className="text-sm text-(--text-2) leading-relaxed">{node.theoryDetail.whyItMatters}</p>
+                <p className="text-sm text-(--text-2) leading-relaxed wrap-anywhere">{node.theoryDetail.whyItMatters}</p>
               </div>
             )}
             {node.theoryDetail.commonPitfalls && node.theoryDetail.commonPitfalls.length > 0 && (
-              <div className="bg-(--warning-subtle) border border-(--warning-subtle) rounded-xl p-5 md:p-6">
+              <div className="min-w-0 bg-(--warning-subtle) border border-(--warning-subtle) rounded-xl p-5 md:p-6">
                 <h4 className="text-xs font-semibold text-(--warning) uppercase tracking-wider mb-4">Common Pitfalls</h4>
                 <ul className="space-y-3">
                   {node.theoryDetail.commonPitfalls.map((p, i) => (
-                    <li key={i} className="text-sm text-(--text-2) flex items-start gap-2 leading-relaxed">
+                    <li key={i} className="text-sm text-(--text-2) flex items-start gap-2 leading-relaxed wrap-anywhere">
                       <span className="text-(--warning) mt-1 shrink-0">⚠</span>
                       {p}
                     </li>
@@ -295,9 +296,7 @@ function TopicSection({ node, techId }: { node: TopicNode; techId: string }) {
                   <p className="text-xs text-(--text-2) mt-1 leading-relaxed">{example.description}</p>
                 )}
               </div>
-              <pre className="bg-(--bg-code) p-5 overflow-x-auto text-xs leading-relaxed">
-                <code className="text-(--text-2)">{example.code}</code>
-              </pre>
+              <CodeBlock code={example.code} language={example.language} />
             </div>
           ))}
         </div>

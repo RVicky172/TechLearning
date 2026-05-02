@@ -24,48 +24,91 @@ export const components: TopicNode = {
     ],
     examples: [
       {
-        title: "Basic Component with JSX",
-        description: "A simple component returning JSX markup.",
-        code: `function Button() {
-  return <button className="px-4 py-2 bg-blue-500 text-white rounded">
-    Click me
-  </button>;
-}`,
+        title: "Real-world component — UserCard",
+        description: "A realistic component that destructures props, computes derived values, and handles conditional rendering.",
+        code: `function UserCard({ name, role, avatarUrl, isOnline }) {
+  const initials = name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase();
+
+  return (
+    <article className="user-card">
+      {avatarUrl
+        ? <img src={avatarUrl} alt={name} className="avatar" />
+        : <span className="avatar-fallback">{initials}</span>
+      }
+      <div className="info">
+        <h3>{name}</h3>
+        <p>{role}</p>
+        <span className={isOnline ? 'badge-online' : 'badge-offline'}>
+          {isOnline ? 'Online' : 'Offline'}
+        </span>
+      </div>
+    </article>
+  );
+}
+
+// Usage
+<UserCard
+  name="Sarah Connor"
+  role="Engineering Lead"
+  isOnline={true}
+/>`,
         language: "jsx",
       },
       {
-        title: "JSX with Expressions",
-        description: "Using curly braces to embed JavaScript expressions inside JSX.",
-        code: `function Greeting({ name, age }) {
-  const isAdult = age >= 18;
-  
+        title: "JSX is JavaScript — expressions and computation",
+        description: "JSX evaluates any JS expression inside {}. Extract complex logic into variables before the return.",
+        code: `function InvoiceRow({ item, taxRate }) {
+  const subtotal  = item.qty * item.unitPrice;
+  const tax       = subtotal * taxRate;
+  const total     = subtotal + tax;
+  const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
   return (
-    <div>
-      <h1>Hello, {name}!</h1>
-      <p>You are {age} years old</p>
-      <p>Status: {isAdult ? "Adult" : "Minor"}</p>
-      <p>Random: {Math.random()}</p>
-    </div>
+    <tr>
+      <td>{item.name}</td>
+      <td>{item.qty}</td>
+      <td>{formatter.format(item.unitPrice)}</td>
+      <td>{formatter.format(tax)}</td>
+      <td className={total > 1000 ? 'highlight' : ''}>
+        {formatter.format(total)}
+      </td>
+    </tr>
   );
 }`,
         language: "jsx",
       },
       {
-        title: "Fragments to Avoid Extra DOM Nodes",
-        description: "Use <> to wrap multiple elements without adding a wrapper div.",
-        code: `function List() {
+        title: "Composition with Fragments",
+        description: "Build larger UIs from small, focused components. Use <> to avoid extra wrapper DOM nodes.",
+        code: `function PageLayout({ title, children, sidebar }) {
   return (
     <>
-      <h2>Items:</h2>
-      <ul>
-        <li>Item 1</li>
-        <li>Item 2</li>
-      </ul>
+      <header className="page-header">
+        <h1>{title}</h1>
+      </header>
+      <div className="page-body">
+        <aside className="page-sidebar">{sidebar}</aside>
+        <main className="page-content">{children}</main>
+      </div>
     </>
   );
 }
 
-// This avoids creating an unnecessary <div> wrapper`,
+// Usage — no unnecessary wrapper div in the DOM
+function App() {
+  return (
+    <PageLayout
+      title="Dashboard"
+      sidebar={<NavMenu />}
+    >
+      <ReportGrid />
+    </PageLayout>
+  );
+}`,
         language: "jsx",
       },
     ],
