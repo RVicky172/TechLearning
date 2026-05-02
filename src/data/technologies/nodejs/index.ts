@@ -157,6 +157,102 @@ const nodejs: Technology = {
         },
       ],
     },
+    {
+      id: "node-interview-questions",
+      title: "Interview Questions",
+      iconName: "HelpCircle",
+      theory:
+        "This section focuses on high-frequency Node.js interview questions with practical production reasoning: event loop behavior, scaling, API reliability, and error handling.",
+      theoryDetail: {
+        keyConcepts: [
+          "Explain Node internals clearly: event loop phases, non-blocking I/O, and process lifecycle",
+          "Use examples that show resilience under load, not just syntax knowledge",
+          "Discuss trade-offs between simplicity, performance, and operational safety",
+        ],
+        whyItMatters:
+          "Node.js interviews often test if you can build stable backend services under real traffic, not just write async/await syntax.",
+        commonPitfalls: [
+          "Ignoring event-loop blocking when discussing performance",
+          "Not distinguishing CPU-bound and I/O-bound workloads",
+          "Forgetting graceful shutdown and error handling in API examples",
+        ],
+      },
+      children: [
+        {
+          id: "node-iq-event-loop",
+          title: "Event Loop Deep Dive",
+          iconName: "RefreshCw",
+          theory: "A classic interview area: execution order and how to avoid starving I/O.",
+          theoryDetail: {
+            examples: [
+              {
+                title: "Q: setTimeout(0) vs setImmediate vs process.nextTick",
+                description:
+                  "A good answer explains phases and warns that recursive nextTick can starve the loop.",
+                code: `setTimeout(() => console.log('timeout'), 0);
+setImmediate(() => console.log('immediate'));
+process.nextTick(() => console.log('nextTick'));
+
+// nextTick runs before returning to the event loop.
+// setTimeout and setImmediate order can vary by context.`,
+                language: "javascript",
+              },
+            ],
+          },
+        },
+        {
+          id: "node-iq-scaling",
+          title: "Scaling & Performance",
+          iconName: "Gauge",
+          theory: "Interviewers test if you can handle throughput while keeping latency predictable.",
+          theoryDetail: {
+            examples: [
+              {
+                title: "Q: How do you scale a Node API?",
+                description:
+                  "Expected answer includes horizontal scaling, clustering/PM2, caching, and observability.",
+                code: `// Typical production approach:
+// 1) Run multiple Node processes (cluster/PM2 or container replicas)
+// 2) Put behind a load balancer
+// 3) Add Redis cache for hot reads
+// 4) Use async queues for heavy background jobs
+// 5) Monitor p95 latency, CPU, memory, and error rates`,
+                language: "javascript",
+              },
+            ],
+          },
+        },
+        {
+          id: "node-iq-error-handling",
+          title: "Error Handling in APIs",
+          iconName: "ShieldAlert",
+          theory: "Reliable services require consistent error boundaries and graceful process behavior.",
+          theoryDetail: {
+            examples: [
+              {
+                title: "Q: How do you prevent crashes from async errors?",
+                description:
+                  "Show centralized middleware, explicit status mapping, and process-level handlers with graceful shutdown.",
+                code: `app.use(async (req, res, next) => {
+  try {
+    await next();
+  } catch (err) {
+    req.log.error({ err }, 'request failed');
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+process.on('unhandledRejection', (err) => {
+  logger.fatal({ err }, 'Unhandled promise rejection');
+  shutdownGracefully();
+});`,
+                language: "javascript",
+              },
+            ],
+          },
+        },
+      ],
+    },
   ],
 };
 

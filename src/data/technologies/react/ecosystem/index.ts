@@ -1,5 +1,6 @@
 import type { TopicNode } from "@/data/types";
 import { routing } from "./routing";
+import { reactRouter } from "./reactRouter";
 import { serverClientBoundaries } from "./serverClientBoundaries";
 import { query } from "./query";
 
@@ -25,5 +26,5 @@ export const reactEcosystem: TopicNode = {
       "Using the wrong tool — Redux for simple state, TanStack Query for local state instead of server state",
     ],
   },
-  children: [routing, serverClientBoundaries, query],
+  children: [reactRouter, routing, serverClientBoundaries, query],
 };

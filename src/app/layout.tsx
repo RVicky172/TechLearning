@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Sidebar } from "@/components/Sidebar";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ResizableShell } from "@/components/ResizableShell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,12 +45,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
           <Header />
-          <div className="flex flex-1">
-            <Sidebar />
-            <div className="flex-1 md:ml-64">
-              {children}
-            </div>
-          </div>
+          <ResizableShell>
+            {children}
+          </ResizableShell>
         </ThemeProvider>
       </body>
     </html>

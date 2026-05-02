@@ -66,7 +66,7 @@ export function Sidebar() {
   const currentTech = currentTechId ? technologies.find(t => t.id === currentTechId) : null;
 
   return (
-    <aside className="sidebar-scroll fixed left-0 top-14 z-40 hidden h-[calc(100vh-3.5rem)] w-64 md:block overflow-y-auto border-r border-(--border) bg-(--bg-root) py-5 px-2">
+    <aside className="sidebar-scroll fixed left-0 top-14 z-40 hidden h-[calc(100vh-3.5rem)] w-(--sidebar-w,16rem) md:block overflow-y-auto border-r border-(--border) bg-(--bg-root) py-5 px-2">
       {currentTech ? (
         <div>
           <div className="px-2 mb-4">

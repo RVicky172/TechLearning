@@ -5,6 +5,7 @@ import { state } from "./state";
 import { events } from "./events";
 import { conditionalRendering } from "./conditionalRendering";
 import { listsAndKeys } from "./listsAndKeys";
+import { duplicateKeys } from "./duplicateKeys";
 import { forms } from "./forms";
 import { propsDrilling } from "./propsDrilling";
 import { lifecycleMethods } from "./lifecycleMethods";
@@ -84,6 +85,7 @@ function Footer() {
     events,
     conditionalRendering,
     listsAndKeys,
+    duplicateKeys,
     forms,
     propsDrilling,
     lifecycleMethods,

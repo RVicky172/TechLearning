@@ -7,6 +7,7 @@ This folder contains all learning content for the React technology. Content is s
 ```text
 react/
 ├── index.ts
+├── interviewQuestions.ts
 ├── README.md
 │
 ├── basics/
@@ -21,6 +22,7 @@ react/
 │   ├── events.ts
 │   ├── conditionalRendering.ts
 │   ├── listsAndKeys.ts
+│   ├── duplicateKeys.ts
 │   ├── forms.ts
 │   ├── propsDrilling.ts
 │   └── lifecycleMethods.ts
@@ -59,6 +61,7 @@ react/
 │
 └── ecosystem/
     ├── index.ts
+    ├── reactRouter.ts
     ├── routing.ts
     ├── serverClientBoundaries.ts
     └── query.ts
@@ -73,6 +76,7 @@ Top-level order in `react/index.ts`:
 3. Advanced Concepts
 4. Patterns & Techniques
 5. React Ecosystem
+6. Interview Questions
 
 ### Basics of React
 
@@ -86,6 +90,7 @@ Top-level order in `react/index.ts`:
 - Event Handling
 - Conditional Rendering
 - Lists & Keys
+- Duplicate Key Warning
 - Forms & Controlled Inputs
 - Props Drilling
 - Lifecycle Methods (Class Components)
@@ -124,9 +129,17 @@ Top-level order in `react/index.ts`:
 
 ### React Ecosystem
 
+- React Router
 - Routing with Next.js
 - Server vs Client Components
 - Data Fetching & Caching
+
+### Interview Questions
+
+- Fundamentals Q&A
+- Hooks & State Q&A
+- Performance Q&A
+- Architecture Q&A
 
 ## How It Works
 

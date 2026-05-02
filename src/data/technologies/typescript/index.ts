@@ -178,6 +178,101 @@ const typescript: Technology = {
         },
       ],
     },
+    {
+      id: "ts-interview-questions",
+      title: "Interview Questions",
+      iconName: "HelpCircle",
+      theory:
+        "This section covers common TypeScript interview questions with practical, production-oriented answers. Focus on type modeling, safety, and maintainability trade-offs.",
+      theoryDetail: {
+        keyConcepts: [
+          "Prefer clear type modeling over clever type tricks",
+          "Explain trade-offs: runtime validation vs compile-time typing",
+          "Use examples that show narrowing, generics, and utility types in real code",
+        ],
+        whyItMatters:
+          "TypeScript interviews test whether you can design robust contracts and reduce runtime bugs in large codebases.",
+        commonPitfalls: [
+          "Using any to silence type errors instead of modeling data shape correctly",
+          "Confusing compile-time type safety with runtime data validation",
+          "Overusing advanced conditional types where simple unions would be clearer",
+        ],
+      },
+      children: [
+        {
+          id: "ts-iq-any-vs-unknown",
+          title: "any vs unknown",
+          iconName: "ShieldAlert",
+          theory: "Interviewers often ask this to test whether you understand safe type narrowing.",
+          theoryDetail: {
+            examples: [
+              {
+                title: "Q: any vs unknown",
+                description:
+                  "unknown is safer because it requires narrowing before use, while any disables type checking.",
+                code: `function parse(input: unknown) {
+  if (typeof input === 'string') {
+    return input.toUpperCase();
+  }
+  return null;
+}
+
+// any would allow unsafe operations with no compiler warnings.`,
+                language: "ts",
+              },
+            ],
+          },
+        },
+        {
+          id: "ts-iq-interface-vs-type",
+          title: "interface vs type",
+          iconName: "Shapes",
+          theory: "Both can model object shapes, but they differ in capabilities and extension patterns.",
+          theoryDetail: {
+            examples: [
+              {
+                title: "Q: When to use interface vs type?",
+                description:
+                  "Use interface for object contracts and extension, type for unions/aliases/complex compositions.",
+                code: `interface User {
+  id: string;
+  name: string;
+}
+
+type ApiResponse<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: string };`,
+                language: "ts",
+              },
+            ],
+          },
+        },
+        {
+          id: "ts-iq-generics",
+          title: "Generics in APIs",
+          iconName: "Box",
+          theory: "A frequent mid/senior question: designing reusable typed APIs without losing inference.",
+          theoryDetail: {
+            examples: [
+              {
+                title: "Q: Build a typed fetch helper",
+                description:
+                  "Show generic return typing and explicit error handling.",
+                code: `async function getJson<T>(url: string): Promise<T> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Request failed');
+  return res.json() as Promise<T>;
+}
+
+type User = { id: string; name: string };
+const user = await getJson<User>('/api/user/1');`,
+                language: "ts",
+              },
+            ],
+          },
+        },
+      ],
+    },
   ],
 };
 

@@ -4,6 +4,7 @@ import { reactAdvanced } from "./advanced/index";
 import { reactEcosystem } from "./ecosystem/index";
 import { reactHooks } from "./hooks/index";
 import { reactPatterns } from "./patterns/index";
+import { reactInterviewQuestions } from "./interviewQuestions";
 
 const react: Technology = {
   id: "react",
@@ -12,7 +13,7 @@ const react: Technology = {
   color: "bg-blue-500",
   iconName: "Layout",
   deviconClass: "devicon-react-original colored",
-  tree: [reactBasics, reactHooks, reactAdvanced, reactPatterns, reactEcosystem],
+  tree: [reactBasics, reactHooks, reactAdvanced, reactPatterns, reactEcosystem, reactInterviewQuestions],
 };
 
 export default react;

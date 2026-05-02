@@ -1,7 +1,7 @@
 import type { TopicNode } from "@/data/types";
 
 export const routing: TopicNode = {
-  id: "react-router",
+  id: "nextjs-app-router",
   title: "Routing with Next.js",
   iconName: "Navigation",
   link: "https://nextjs.org/docs/app/building-your-application/routing",
