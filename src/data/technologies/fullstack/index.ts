@@ -14,7 +14,7 @@ const fullstack: Technology = {
   description: "Essential backend, infrastructure, and system design concepts every frontend developer should know.",
   color: "bg-violet-600",
   iconName: "Layers",
-  deviconClass: "devicon-nodejs-plain",
+  deviconClass: "devicon-linux-plain",
   tree: [
     fullstackNetworking,
     fullstackApis,

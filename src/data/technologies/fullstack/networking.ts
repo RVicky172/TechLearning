@@ -5,7 +5,7 @@ export const fullstackNetworking: TopicNode = {
   title: "Networking Basics",
   iconName: "Network",
   theory:
-    "Every web application communicates over a network. Understanding how devices are addressed, how domain names resolve, and how HTTP transfers data is foundational knowledge every frontend developer needs.",
+    "Every web application communicates over a network. Understanding how devices are addressed, how domain names resolve, and how HTTP transfers data is foundational knowledge every web developer needs.",
   theoryDetail: {
     keyConcepts: [
       "IP addresses uniquely identify every device on a network",
