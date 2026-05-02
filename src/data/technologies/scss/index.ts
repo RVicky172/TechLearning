@@ -20,7 +20,7 @@ const scss: Technology = {
           "The Dart Sass implementation is the canonical, actively maintained version — LibSass and Node-sass are deprecated",
         ],
         whyItMatters:
-          "SCSS lets you write DRY, organised stylesheets that would be unwieldy in plain CSS. Variables, nesting, and mixins reduce repetition and make global changes — like a colour-scheme update — a one-line edit instead of a find-and-replace across hundreds of files.",
+          "SCSS lets you write DRY, organized stylesheets that would be unwieldy in plain CSS. Variables, nesting, and mixins reduce repetition and make global changes — like a color-scheme update — a one-line edit instead of a find-and-replace across hundreds of files.",
         commonPitfalls: [
           "Using the deprecated @import rule instead of the modern @use / @forward system",
           "Installing node-sass (deprecated) instead of sass (Dart Sass) from npm",
@@ -41,7 +41,7 @@ const scss: Technology = {
               "!default flag: $spacing: 8px !default; only sets the value if not already defined — useful in libraries",
             ],
             whyItMatters:
-              "Variables centralise design tokens (colours, spacing, font stacks) so a single edit propagates across the entire compiled stylesheet. They are the entry point for most Sass adoption.",
+              "Variables centralize design tokens (colors, spacing, font stacks) so a single edit propagates across the entire compiled stylesheet. They are the entry point for most Sass adoption.",
             commonPitfalls: [
               "Confusing Sass variables ($var) with CSS custom properties (--var): Sass vars are erased at compile time",
               "Declaring variables in partials that are not yet @use'd — the variable is invisible outside that file",
@@ -139,11 +139,11 @@ const scss: Technology = {
           title: "Functions",
           iconName: "FunctionSquare",
           link: "https://sass-lang.com/documentation/at-rules/function/",
-          theory: "Sass functions compute a value and return it with @return. They are invoked like CSS function calls and can perform arithmetic, string manipulation, or colour math. Sass ships many built-in functions; you can also write custom ones.",
+          theory: "Sass functions compute a value and return it with @return. They are invoked like CSS function calls and can perform arithmetic, string manipulation, or color math. Sass ships many built-in functions; you can also write custom ones.",
           theoryDetail: {
             keyConcepts: [
               "@function rem($px) { @return $px / 16px * 1rem; } — converts px to rem",
-              "Built-in colour functions: lighten(), darken(), mix(), adjust-color(), scale-color()",
+              "Built-in color functions: lighten(), darken(), mix(), adjust-color(), scale-color()",
               "math.div($a, $b) from @use 'sass:math' — the safe division function replacing the / operator",
             ],
             whyItMatters:
@@ -182,7 +182,7 @@ const scss: Technology = {
       id: "scss-control-directives",
       title: "Control Directives",
       iconName: "GitBranch",
-      theory: "Sass provides programming constructs — @if, @each, @for, and @while — that run at compile time. They enable generating repetitive CSS (utility classes, grid variants, colour scales) programmatically rather than by hand.",
+      theory: "Sass provides programming constructs — @if, @each, @for, and @while — that run at compile time. They enable generating repetitive CSS (utility classes, grid variants, color scales) programmatically rather than by hand.",
       theoryDetail: {
         keyConcepts: [
           "@if / @else if / @else — conditional CSS generation based on variable values or arguments",
@@ -190,7 +190,7 @@ const scss: Technology = {
           "@for $i from 1 through 12 — numeric loop, inclusive of the end value",
         ],
         whyItMatters:
-          "Utility-first frameworks like Tailwind generate thousands of classes with loops. Writing your own @each loops over a colour map or spacing scale produces consistent, DRY CSS that would take hours to write by hand.",
+          "Utility-first frameworks like Tailwind generate thousands of classes with loops. Writing your own @each loops over a color map or spacing scale produces consistent, DRY CSS that would take hours to write by hand.",
         commonPitfalls: [
           "Using @while without a termination condition — an infinite loop will hang the Sass compiler",
           "Generating CSS that is never used — prefer generating only what is needed or purging unused output",
@@ -231,7 +231,7 @@ const scss: Technology = {
               "@for $i from 1 through 5 { .col-#{$i} { width: $i * 20%; } }",
             ],
             whyItMatters:
-              "Loops replace hand-written repetitive classes. Generating a 12-column grid, a spacing scale, or a full colour palette with a loop takes 5 lines instead of 50 and is trivially updated by changing the source list.",
+              "Loops replace hand-written repetitive classes. Generating a 12-column grid, a spacing scale, or a full color palette with a loop takes 5 lines instead of 50 and is trivially updated by changing the source list.",
             commonPitfalls: [
               "Using string interpolation #{$var} correctly — required when the variable appears in a selector or property name",
               "Forgetting that @for with through includes the last number but to excludes it",
@@ -266,7 +266,7 @@ const scss: Technology = {
           title: "Maps",
           iconName: "LayoutList",
           link: "https://sass-lang.com/documentation/values/maps/",
-          theory: "Maps associate keys with values. They are the primary tool for design-token collections such as colour palettes, spacing scales, and breakpoint sets.",
+          theory: "Maps associate keys with values. They are the primary tool for design-token collections such as color palettes, spacing scales, and breakpoint sets.",
           theoryDetail: {
             keyConcepts: [
               "$breakpoints: ('sm': 640px, 'md': 768px, 'lg': 1024px, 'xl': 1280px);",
@@ -394,7 +394,7 @@ const scss: Technology = {
           id: "scss-q-variables-vs-custom-props",
           title: "Sass Variables vs CSS Custom Properties",
           iconName: "HelpCircle",
-          theory: "Sass variables ($var) are resolved at compile time and erased from the output. CSS custom properties (--var) survive in the output and can be changed at runtime with JavaScript or via :root overrides. Use Sass vars for build-time tokens; use custom properties for runtime-mutable design tokens like theme colours.",
+          theory: "Sass variables ($var) are resolved at compile time and erased from the output. CSS custom properties (--var) survive in the output and can be changed at runtime with JavaScript or via :root overrides. Use Sass vars for build-time tokens; use custom properties for runtime-mutable design tokens like theme colors.",
           theoryDetail: {
             keyConcepts: [
               "Sass variable: $brand: #3b82f6; — gone after compilation, no overhead in the browser",
@@ -405,7 +405,7 @@ const scss: Technology = {
               "This distinction is a common interview topic. The wrong answer ('they're the same') reveals a surface-level understanding of SCSS.",
             commonPitfalls: [
               "Saying CSS custom properties replaced Sass variables completely — both have distinct use-cases",
-              "Using Sass variables for theme colours when dark-mode switching requires runtime updates",
+              "Using Sass variables for theme colors when dark-mode switching requires runtime updates",
             ],
           },
         },
