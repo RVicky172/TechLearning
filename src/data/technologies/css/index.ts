@@ -227,7 +227,7 @@ const css: Technology = {
           theory: "clamp(min, preferred, max) creates values that scale with the viewport between a minimum and maximum. Combined with viewport units it produces truly fluid typography with no media queries.",
           theoryDetail: {
             keyConcepts: [
-              "clamp(1rem, 2.5vw, 2rem) — never smaller than 1 rem or larger than 2 rem",
+              "clamp(1rem, 2.5vw, 2rem) — never smaller than 1rem or larger than 2rem",
               "min() and max() are the individual counterparts and can be composed",
               "CSS custom properties expose the scale tokens: --text-lg: clamp(1.125rem, 1rem + 0.5vw, 1.5rem)",
             ],
@@ -405,7 +405,7 @@ const css: Technology = {
         whyItMatters:
           "CSS interviews reveal whether a candidate can write maintainable, performant, and accessible styles — not just replicate a Figma mockup. These questions separate practitioners from guessers.",
         commonPitfalls: [
-          "Memorising syntax without understanding why — interviewers follow up with 'why not just use X?'",
+          "Memorizing syntax without understanding why — interviewers follow up with 'why not just use X?'",
           "Ignoring performance concerns: animating layout properties, large paint areas, unused CSS",
           "Not mentioning accessibility — color contrast, focus styles, and reduced-motion are expected at senior level",
         ],
