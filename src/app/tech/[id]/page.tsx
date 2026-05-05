@@ -303,6 +303,15 @@ function TopicSection({ node, techId }: { node: TopicNode; techId: string }) {
                 )}
               </div>
               <CodeBlock code={example.code} language={example.language} />
+              {example.output && (
+                <div className="border-t border-(--border)">
+                  <div className="flex items-center gap-2 px-6 py-2.5 bg-(--bg-elevated) border-b border-(--border)">
+                    <span className="w-2 h-2 rounded-full bg-(--success) shrink-0" />
+                    <span className="text-[10px] font-semibold text-(--success) uppercase tracking-widest">Output / Preview</span>
+                  </div>
+                  <pre className="px-6 py-4 font-mono text-xs leading-relaxed text-(--text-2) bg-(--bg-elevated) overflow-x-auto whitespace-pre">{example.output}</pre>
+                </div>
+              )}
             </div>
           ))}
         </div>
