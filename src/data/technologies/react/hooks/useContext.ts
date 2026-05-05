@@ -4,6 +4,7 @@ export const hookUseContext: TopicNode = {
   id: "hook-usecontext",
   title: "useContext",
   iconName: "Share2",
+  demoComponentKey: "useContext",
   link: "https://react.dev/reference/react/useContext",
   theory:
     "useContext reads the current value of a React Context without needing to pass it down as a prop at every level. Any component in the tree below the Provider can call useContext(MyContext) to subscribe — it re-renders whenever the context value changes.",
@@ -24,74 +25,87 @@ export const hookUseContext: TopicNode = {
     ],
     examples: [
       {
-        title: "Theme context",
-        description: "Share a theme value and toggle function across the whole app.",
-        code: `import { createContext, useContext, useState, useMemo } from 'react';
+        title: "UseContextDemo.tsx",
+        description: "Exact source from react/src/components/hooks/UseContextDemo.tsx",
+        code: `import { useThemeContext } from '../../context/ThemeContext'
+import { useRenderCount } from '../../hooks/useRenderCount'
 
-const ThemeContext = createContext({ theme: 'light', toggle: () => {} });
-
-export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState('light');
-
-  // ✅ Memoize so consumers don't re-render when ThemeProvider's
-  //    parent re-renders for an unrelated reason
-  const value = useMemo(
-    () => ({ theme, toggle: () => setTheme(t => t === 'light' ? 'dark' : 'light') }),
-    [theme]
-  );
+export function UseContextDemo() {
+  const renderCount = useRenderCount()
+  const { theme, setTheme } = useThemeContext()
 
   return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  );
-}
-
-// Custom hook for ergonomic access
-export function useTheme() {
-  return useContext(ThemeContext);
-}
-
-// Any component anywhere in the tree
-function ThemeToggle() {
-  const { theme, toggle } = useTheme();
-  return <button onClick={toggle}>Current: {theme}</button>;
+    <article>
+      <h2>useContext</h2>
+      <p className="render-badge">Render count: {renderCount}</p>
+      <p>Reads and updates global theme context.</p>
+      <div className="row">
+        <button
+          type="button"
+          onClick={() => setTheme((current) => (current === 'sunrise' ? 'mint' : 'sunrise'))}
+        >
+          Toggle Theme ({theme})
+        </button>
+      </div>
+    </article>
+  )
 }`,
-        language: "jsx",
+        language: "tsx",
       },
       {
-        title: "Auth context",
-        description: "Provide the current user to the whole app and protect routes.",
-        code: `import { createContext, useContext, useState } from 'react';
+        title: "ThemeContext.tsx",
+        description: "Exact source from react/src/context/ThemeContext.tsx",
+        code: `import { createContext, useContext, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react'
 
-const AuthContext = createContext(null);
+export type Theme = 'sunrise' | 'mint'
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-
-  const login  = (userData) => setUser(userData);
-  const logout = () => setUser(null);
-
-  return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+type ThemeContextValue = {
+  theme: Theme
+  setTheme: Dispatch<SetStateAction<Theme>>
 }
 
-export const useAuth = () => useContext(AuthContext);
+export const ThemeContext = createContext<ThemeContextValue | null>(null)
 
-function Dashboard() {
-  const { user, logout } = useAuth();
-  if (!user) return <p>Please log in.</p>;
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>('sunrise')
+
   return (
-    <div>
-      <p>Welcome, {user.name}</p>
-      <button onClick={logout}>Log out</button>
-    </div>
-  );
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  )
+}
+
+export function useThemeContext() {
+  const context = useContext(ThemeContext)
+  if (!context) {
+    throw new Error('ThemeContext is missing. Wrap with ThemeProvider.')
+  }
+  return context
 }`,
-        language: "jsx",
+        language: "tsx",
+      },
+      {
+        title: "useRenderCount.ts",
+        description: "Exact source from react/src/hooks/useRenderCount.ts",
+        code: `import { useEffect, useId } from 'react'
+
+const renderCountStore = new Map<string, number>()
+
+export function useRenderCount() {
+  const id = useId()
+  const nextCount = (renderCountStore.get(id) ?? 0) + 1
+  renderCountStore.set(id, nextCount)
+
+  useEffect(() => {
+    return () => {
+      renderCountStore.delete(id)
+    }
+  }, [id])
+
+  return nextCount
+}`,
+        language: "ts",
       },
     ],
   },

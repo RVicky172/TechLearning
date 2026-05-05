@@ -4,6 +4,7 @@ export const hookCustom: TopicNode = {
   id: "hook-custom",
   title: "Custom Hooks",
   iconName: "Package",
+  demoComponentKey: "createCustomHookGuide",
   link: "https://react.dev/learn/reusing-logic-with-custom-hooks",
   theory:
     "A custom hook is a plain JavaScript function whose name starts with 'use' and that calls one or more built-in hooks. They are the primary mechanism for extracting and sharing stateful logic between components — without adding components to the tree or changing component hierarchy.",
@@ -24,107 +25,90 @@ export const hookCustom: TopicNode = {
     ],
     examples: [
       {
-        title: "useLocalStorage — persist state across sessions",
-        description: "A drop-in replacement for useState that syncs to localStorage.",
-        code: `import { useState, useEffect } from 'react';
+        title: "CreateCustomHookGuide.tsx",
+        description: "Exact source from react/src/components/hooks/CreateCustomHookGuide.tsx",
+        code: `import { useCounter } from '../../hooks/useCounter'
 
-function useLocalStorage(key, defaultValue) {
-  const [value, setValue] = useState(() => {
-    try {
-      const stored = localStorage.getItem(key);
-      return stored !== null ? JSON.parse(stored) : defaultValue;
-    } catch {
-      return defaultValue;
-    }
-  });
+export function CreateCustomHookGuide() {
+  const likes = useCounter(10)
 
-  useEffect(() => {
-    localStorage.setItem(key, JSON.stringify(value));
-  }, [key, value]);
-
-  return [value, setValue];
-}
-
-// Usage — identical API to useState
-function Settings() {
-  const [theme, setTheme] = useLocalStorage('theme', 'dark');
   return (
-    <select value={theme} onChange={e => setTheme(e.target.value)}>
-      <option value="dark">Dark</option>
-      <option value="light">Light</option>
-    </select>
-  );
+    <article>
+      <h2>How To Create A Custom Hook</h2>
+      <p className="render-badge">useRenderCount (inside useCounter): {likes.renderCount}</p>
+      <p className="muted">This number is displayed in UI from the custom hook return value.</p>
+      <p>Custom hooks are regular functions that start with use and can call other hooks.</p>
+      <ol>
+        <li>Create a function named with use prefix.</li>
+        <li>Move repeated stateful logic into that function.</li>
+        <li>Return data and actions to consuming components.</li>
+        <li>Reuse it in multiple UI components.</li>
+      </ol>
+
+      <div className="row">
+        <button type="button" onClick={likes.decrement}>
+          -
+        </button>
+        <strong>{likes.count}</strong>
+        <button type="button" onClick={likes.increment}>
+          +
+        </button>
+        <button type="button" onClick={likes.reset}>
+          Reset
+        </button>
+      </div>
+
+      <p className="muted">This output uses the reusable useCounter custom hook.</p>
+    </article>
+  )
 }`,
-        language: "jsx",
+        language: "tsx",
       },
       {
-        title: "useFetch — reusable data fetching",
-        description: "Encapsulate loading, error, and data state for any fetch call.",
-        code: `import { useState, useEffect } from 'react';
+        title: "useCounter.ts",
+        description: "Exact source from react/src/hooks/useCounter.ts",
+        code: `import { useCallback, useState } from 'react'
+import { useRenderCount } from './useRenderCount'
 
-function useFetch(url) {
-  const [data,    setData]    = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState(null);
+export function useCounter(initialValue = 0) {
+  const renderCount = useRenderCount()
+  const [count, setCount] = useState(initialValue)
 
-  useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
+  const increment = useCallback(() => setCount((value) => value + 1), [])
+  const decrement = useCallback(() => setCount((value) => value - 1), [])
+  const reset = useCallback(() => setCount(initialValue), [initialValue])
 
-    fetch(url, { signal: controller.signal })
-      .then(r => { if (!r.ok) throw new Error(r.statusText); return r.json(); })
-      .then(setData)
-      .catch(err => { if (err.name !== 'AbortError') setError(err); })
-      .finally(() => setLoading(false));
-
-    return () => controller.abort();
-  }, [url]);
-
-  return { data, loading, error };
-}
-
-// Any component — no fetch boilerplate needed
-function RepoCard({ owner, repo }) {
-  const { data, loading, error } = useFetch(
-    \`https://api.github.com/repos/\${owner}/\${repo}\`
-  );
-
-  if (loading) return <p>Loading…</p>;
-  if (error)   return <p>Error: {error.message}</p>;
-  return <p>{data.full_name} ⭐ {data.stargazers_count}</p>;
+  return {
+    renderCount,
+    count,
+    increment,
+    decrement,
+    reset,
+  }
 }`,
-        language: "jsx",
+        language: "ts",
       },
       {
-        title: "useDebounce — delay expensive effects",
-        description: "Debounce any value so effects only fire after the user stops changing it.",
-        code: `import { useState, useEffect } from 'react';
+        title: "useRenderCount.ts",
+        description: "Exact source from react/src/hooks/useRenderCount.ts",
+        code: `import { useEffect, useId } from 'react'
 
-function useDebounce(value, delay = 300) {
-  const [debounced, setDebounced] = useState(value);
+const renderCountStore = new Map<string, number>()
 
-  useEffect(() => {
-    const id = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(id);
-  }, [value, delay]);
-
-  return debounced;
-}
-
-function SearchInput() {
-  const [query, setQuery]     = useState('');
-  const debouncedQuery        = useDebounce(query, 400);
+export function useRenderCount() {
+  const id = useId()
+  const nextCount = (renderCountStore.get(id) ?? 0) + 1
+  renderCountStore.set(id, nextCount)
 
   useEffect(() => {
-    if (!debouncedQuery) return;
-    console.log('Searching for:', debouncedQuery);
-    // fire API call here
-  }, [debouncedQuery]);
+    return () => {
+      renderCountStore.delete(id)
+    }
+  }, [id])
 
-  return <input value={query} onChange={e => setQuery(e.target.value)}
-                placeholder="Search…" />;
+  return nextCount
 }`,
-        language: "jsx",
+        language: "ts",
       },
     ],
   },

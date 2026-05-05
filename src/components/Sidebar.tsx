@@ -16,9 +16,9 @@ function SidebarIcon({ name, className }: { name: string; className: string }) {
   if (!Icon) return null;
   return createElement(Icon, { className });
 }
-function SidebarTreeNode({ node, depth = 0, techId, activeTopic }: { node: TopicNode; depth?: number; techId: string; activeTopic: string | null }) {
+function SidebarTreeNode({ node, depth = 0, techId, activeTopic, onToggle, expandedId }: { node: TopicNode; depth?: number; techId: string; activeTopic: string | null; onToggle?: (id: string) => void; expandedId?: string | null }) {
   const isActive = node.id === activeTopic;
-  const [open, setOpen] = useState(depth === 0);
+  const isExpanded = depth === 0 ? expandedId === node.id : true;
   const hasChildren = node.children && node.children.length > 0;
 
   return (
@@ -29,6 +29,11 @@ function SidebarTreeNode({ node, depth = 0, techId, activeTopic }: { node: Topic
       >
         <Link
           href={`/tech/${techId}?topic=${node.id}`}
+          onClick={() => {
+            if (hasChildren && depth === 0) {
+              onToggle?.(node.id);
+            }
+          }}
           className={`flex-1 flex items-center gap-2 py-1.5 text-sm transition-colors min-w-0 ${isActive ? "text-(--accent-fg) font-medium" : "text-(--text-2) hover:text-(--text-1)"}`}
         >
           {node.iconName && <SidebarIcon name={node.iconName} className="w-3.5 h-3.5 shrink-0 text-(--text-3)" />}
@@ -36,20 +41,20 @@ function SidebarTreeNode({ node, depth = 0, techId, activeTopic }: { node: Topic
         </Link>
         {hasChildren && (
           <button
-            onClick={() => setOpen(o => !o)}
+            onClick={() => depth === 0 && onToggle?.(node.id)}
             className="shrink-0 p-1 text-(--text-3) hover:text-(--text-1) transition-colors"
-            aria-label={open ? "Collapse" : "Expand"}
+            aria-label={isExpanded ? "Collapse" : "Expand"}
           >
-            {open
+            {isExpanded
               ? <ChevronDown className="w-3.5 h-3.5" />
               : <ChevronRight className="w-3.5 h-3.5" />}
           </button>
         )}
       </div>
-      {hasChildren && open && (
-        <ul>
+      {hasChildren && isExpanded && (
+        <ul className="border-l border-(--border-subtle) ml-2">
           {node.children!.map(child => (
-            <SidebarTreeNode key={child.id} node={child} depth={depth + 1} techId={techId} activeTopic={activeTopic} />
+            <SidebarTreeNode key={child.id} node={child} depth={depth + 1} techId={techId} activeTopic={activeTopic} expandedId={expandedId} />
           ))}
         </ul>
       )}
@@ -64,6 +69,11 @@ export function Sidebar() {
   const techMatch = pathname.match(/^\/tech\/([^/]+)/);
   const currentTechId = techMatch?.[1];
   const currentTech = currentTechId ? technologies.find(t => t.id === currentTechId) : null;
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const handleToggle = (id: string) => {
+    setExpandedId(expandedId === id ? null : id);
+  };
 
   return (
     <aside className="sidebar-scroll fixed left-0 top-14 z-40 hidden h-[calc(100vh-3.5rem)] w-(--sidebar-w,16rem) md:block overflow-y-auto border-r border-(--border) bg-(--bg-root) py-5 px-2">
@@ -92,7 +102,7 @@ export function Sidebar() {
               </Link>
             </li>
             {currentTech.tree.map(node => (
-              <SidebarTreeNode key={node.id} node={node} depth={0} techId={currentTechId!} activeTopic={activeTopic} />
+              <SidebarTreeNode key={node.id} node={node} depth={0} techId={currentTechId!} activeTopic={activeTopic} onToggle={handleToggle} expandedId={expandedId} />
             ))}
           </ul>
         </div>

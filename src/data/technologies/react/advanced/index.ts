@@ -5,6 +5,7 @@ import { effects } from "./effects";
 import { performance } from "./performance";
 import { virtualization } from "./virtualization";
 import { patterns } from "./patterns";
+import { batching } from "./batching";
 
 export const reactAdvanced: TopicNode = {
   id: "react-advanced",
@@ -28,5 +29,5 @@ export const reactAdvanced: TopicNode = {
       "Creating too many custom hooks too early — let the pattern emerge naturally before abstracting",
     ],
   },
-  children: [context, stateStrategy, effects, performance, virtualization, patterns],
+  children: [context, stateStrategy, batching, effects, performance, virtualization, patterns],
 };

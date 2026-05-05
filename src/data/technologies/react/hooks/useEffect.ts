@@ -4,6 +4,7 @@ export const hookUseEffect: TopicNode = {
   id: "hook-useeffect",
   title: "useEffect",
   iconName: "Zap",
+  demoComponentKey: "useEffect",
   link: "https://react.dev/reference/react/useEffect",
   theory:
     "useEffect synchronises a component with an external system — an API, a WebSocket, a timer, browser storage, or any other side effect. It runs after the browser has painted the screen, making it safe for DOM reads and async operations.",
@@ -24,83 +25,77 @@ export const hookUseEffect: TopicNode = {
     ],
     examples: [
       {
-        title: "Data fetch with AbortController",
-        description: "Cancel the in-flight request when the component unmounts or the id changes.",
-        code: `import { useState, useEffect } from 'react';
+        title: "UseEffectDemo.tsx",
+        description: "Exact source from react/src/components/hooks/UseEffectDemo.tsx",
+        code: `import { useEffect, useState } from 'react'
+import { useRenderCount } from '../../hooks/useRenderCount'
 
-function UserCard({ userId }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+export function UseEffectDemo() {
+  const renderCount = useRenderCount()
+  const [clicks, setClicks] = useState(0)
+  const [enabled, setEnabled] = useState(true)
+  const [seconds, setSeconds] = useState(0)
 
   useEffect(() => {
-    const controller = new AbortController();
+    document.title = \`Hooks clicks: \${clicks}\`
+  }, [clicks])
 
-    (async () => {
-      try {
-        const res = await fetch(\`/api/users/\${userId}\`,
-          { signal: controller.signal }
-        );
-        setUser(await res.json());
-      } catch (err) {
-        if (err.name !== 'AbortError') console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    })();
+  useEffect(() => {
+    if (!enabled) {
+      return
+    }
 
-    return () => controller.abort();   // cleanup on unmount / dep change
-  }, [userId]);
+    const intervalId = window.setInterval(() => {
+      setSeconds((value) => value + 1)
+    }, 1000)
 
-  if (loading) return <p>Loading…</p>;
-  return <div>{user?.name}</div>;
+    // Cleanup runs before this effect runs again and when component unmounts.
+    return () => {
+      window.clearInterval(intervalId)
+    }
+  }, [enabled])
+
+  return (
+    <article>
+      <h2>useEffect</h2>
+      <p className="render-badge">Render count: {renderCount}</p>
+      <p>One effect updates document title. Another effect starts and cleans an interval.</p>
+      <div className="row">
+        <button type="button" onClick={() => setClicks((value) => value + 1)}>
+          Update title ({clicks})
+        </button>
+        <button type="button" onClick={() => setEnabled((value) => !value)}>
+          {enabled ? 'Stop timer' : 'Start timer'}
+        </button>
+      </div>
+      <p className="muted">Timer seconds: {seconds}</p>
+      <p className="muted">Dependency array [enabled] means this timer effect runs only when enabled changes.</p>
+    </article>
+  )
 }`,
-        language: "jsx",
+        language: "tsx",
       },
       {
-        title: "Event listener with cleanup",
-        description: "Attach a window resize listener and remove it when the component unmounts.",
-        code: `import { useState, useEffect } from 'react';
+        title: "useRenderCount.ts",
+        description: "Exact source from react/src/hooks/useRenderCount.ts",
+        code: `import { useEffect, useId } from 'react'
 
-function useWindowWidth() {
-  const [width, setWidth] = useState(window.innerWidth);
+const renderCountStore = new Map<string, number>()
 
-  useEffect(() => {
-    const handleResize = () => setWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize); // cleanup
-  }, []);  // empty → attach once, remove on unmount
-
-  return width;
-}
-
-function ResponsiveBanner() {
-  const width = useWindowWidth();
-  return <p>Window is {width}px wide</p>;
-}`,
-        language: "jsx",
-      },
-      {
-        title: "Sync state to localStorage",
-        description: "Persist a value to localStorage every time it changes.",
-        code: `import { useState, useEffect } from 'react';
-
-function usePersisted(key, defaultValue) {
-  const [value, setValue] = useState(
-    () => JSON.parse(localStorage.getItem(key) ?? 'null') ?? defaultValue
-  );
+export function useRenderCount() {
+  const id = useId()
+  const nextCount = (renderCountStore.get(id) ?? 0) + 1
+  renderCountStore.set(id, nextCount)
 
   useEffect(() => {
-    localStorage.setItem(key, JSON.stringify(value));
-  }, [key, value]);
+    return () => {
+      renderCountStore.delete(id)
+    }
+  }, [id])
 
-  return [value, setValue];
-}
-
-function App() {
-  const [name, setName] = usePersisted('username', '');
-  return <input value={name} onChange={e => setName(e.target.value)} />;
+  return nextCount
 }`,
-        language: "jsx",
+        language: "ts",
       },
     ],
   },

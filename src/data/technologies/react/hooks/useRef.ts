@@ -4,6 +4,7 @@ export const hookUseRef: TopicNode = {
   id: "hook-useref",
   title: "useRef",
   iconName: "Anchor",
+  demoComponentKey: "useRef",
   link: "https://react.dev/reference/react/useRef",
   theory:
     "useRef returns a mutable container object { current: value } that persists across renders without causing re-renders when changed. It has two distinct uses: holding a reference to a DOM node, and storing any mutable value that should survive re-renders but doesn't need to trigger them.",
@@ -24,77 +25,95 @@ export const hookUseRef: TopicNode = {
     ],
     examples: [
       {
-        title: "Focus an input programmatically",
-        description: "Attach a ref to an input and focus it when a button is clicked.",
-        code: `import { useRef } from 'react';
+        title: "UseRefDemo.tsx",
+        description: "Exact source from react/src/components/hooks/UseRefDemo.tsx",
+        code: `import { useRef, useState } from 'react'
+import { useRenderCount } from '../../hooks/useRenderCount'
 
-function SearchBar() {
-  const inputRef = useRef(null);
-
-  const focusInput = () => {
-    inputRef.current?.focus();
-  };
+export function UseRefDemo() {
+  const renderCount = useRenderCount()
+  const [draft, setDraft] = useState('React refs are useful for imperative DOM access.')
+  const [lastRead, setLastRead] = useState('Nothing read yet.')
+  const inputRef = useRef<HTMLInputElement>(null)
 
   return (
-    <div>
-      <input ref={inputRef} placeholder="Search..." />
-      <button onClick={focusInput}>Focus Search</button>
-    </div>
-  );
+    <article>
+      <h2>useRef</h2>
+      <p className="render-badge">Render count: {renderCount}</p>
+      <p>Use state for reactive UI, and useRef when you need direct access to the input element.</p>
+      <input
+        ref={inputRef}
+        value={draft}
+        onChange={(event) => setDraft(event.target.value)}
+        placeholder="Type here"
+      />
+      <div className="row">
+        <button type="button" onClick={() => inputRef.current?.focus()}>
+          Focus input
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            if (!inputRef.current) {
+              return
+            }
+            inputRef.current.value = draft.toUpperCase()
+            inputRef.current.focus()
+          }}
+        >
+          Modify with ref
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setLastRead(inputRef.current?.value ?? 'Input is not available.')
+          }}
+        >
+          Read current value
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            if (!inputRef.current) {
+              return
+            }
+            setDraft(inputRef.current.value)
+          }}
+        >
+          Sync ref to state
+        </button>
+      </div>
+      <p className="muted">Last value read from ref: {lastRead}</p>
+      <p className="muted">
+        "Modify with ref" changes the DOM value directly. "Sync ref to state" copies that value back
+        into React state.
+      </p>
+    </article>
+  )
 }`,
-        language: "jsx",
+        language: "tsx",
       },
       {
-        title: "Persist a value without re-rendering",
-        description: "Store a timer ID so it can be cleared later, without affecting the render cycle.",
-        code: `import { useState, useRef } from 'react';
+        title: "useRenderCount.ts",
+        description: "Exact source from react/src/hooks/useRenderCount.ts",
+        code: `import { useEffect, useId } from 'react'
 
-function Stopwatch() {
-  const [elapsed, setElapsed] = useState(0);
-  const timerRef = useRef(null);   // stores interval ID — NOT state
+const renderCountStore = new Map<string, number>()
 
-  const start = () => {
-    if (timerRef.current) return;  // already running
-    timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000);
-  };
+export function useRenderCount() {
+  const id = useId()
+  const nextCount = (renderCountStore.get(id) ?? 0) + 1
+  renderCountStore.set(id, nextCount)
 
-  const stop = () => {
-    clearInterval(timerRef.current);
-    timerRef.current = null;
-  };
+  useEffect(() => {
+    return () => {
+      renderCountStore.delete(id)
+    }
+  }, [id])
 
-  return (
-    <div>
-      <p>{elapsed}s</p>
-      <button onClick={start}>Start</button>
-      <button onClick={stop}>Stop</button>
-    </div>
-  );
+  return nextCount
 }`,
-        language: "jsx",
-      },
-      {
-        title: "Track previous value",
-        description: "Capture the previous render's value using a ref updated in an effect.",
-        code: `import { useState, useRef, useEffect } from 'react';
-
-function usePrevious(value) {
-  const ref = useRef(undefined);
-  useEffect(() => { ref.current = value; });   // runs after render
-  return ref.current;                          // returns value from LAST render
-}
-
-function PriceDisplay({ price }) {
-  const prev = usePrevious(price);
-  const diff = prev !== undefined ? price - prev : 0;
-
-  return (
-    <p>
-      \${price} {diff !== 0 && <span>({diff > 0 ? '+' : ''}{diff})</span>}
-    </p>
-  );
-}`,
-        language: "jsx",
+        language: "ts",
       },
     ],
   },

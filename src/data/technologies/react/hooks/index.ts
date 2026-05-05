@@ -9,6 +9,21 @@ import { effectAlternatives } from "./effectAlternatives";
 import { hookUseLayoutEffect } from "./useLayoutEffect";
 import { hookUseTransition } from "./useTransition";
 import { hookCustom } from "./custom";
+import {
+  hookPortal,
+  hookRefAsProp,
+  hookUse,
+  hookUseActionState,
+  hookUseDebugValue,
+  hookUseDeferredValue,
+  hookUseEffectEvent,
+  hookUseId,
+  hookUseImperativeHandle,
+  hookUseInsertionEffect,
+  hookUseOptimistic,
+  hookUseStateEvent,
+  hookUseSyncExternalStore,
+} from "./modern";
 
 export const reactHooks: TopicNode = {
   id: "react-hooks",
@@ -33,15 +48,47 @@ export const reactHooks: TopicNode = {
     ],
   },
   children: [
-    hookUseState,
-    hookUseReducer,
-    hookUseRef,
-    hookUseMemoCallback,
-    hookUseContext,
-    hookUseEffect,
-    effectAlternatives,
-    hookUseLayoutEffect,
-    hookUseTransition,
-    hookCustom,
+    {
+      id: "react-hooks-core",
+      title: "Core Hooks",
+      iconName: "Layers",
+      theory: "State, context, and references that power most day-to-day React components.",
+      children: [hookUseState, hookUseReducer, hookUseRef, hookUseContext, hookCustom],
+    },
+    {
+      id: "react-hooks-effects",
+      title: "Effects and Lifecycle",
+      iconName: "Activity",
+      theory:
+        "When and how to synchronize components with external systems and browser layout timing.",
+      children: [hookUseEffect, effectAlternatives, hookUseLayoutEffect, hookUseInsertionEffect],
+    },
+    {
+      id: "react-hooks-performance",
+      title: "Performance and Concurrency",
+      iconName: "Gauge",
+      theory:
+        "Optimize expensive renders and prioritize urgent updates for smoother user interactions.",
+      children: [hookUseMemoCallback, hookUseTransition, hookUseDeferredValue, hookUseSyncExternalStore],
+    },
+    {
+      id: "react-hooks-modern",
+      title: "Modern React 19 APIs",
+      iconName: "Sparkles",
+      theory:
+        "Newer hooks and patterns introduced or highlighted in modern React versions.",
+      children: [
+        hookUseId,
+        hookUseImperativeHandle,
+        hookRefAsProp,
+        hookUse,
+        hookUseActionState,
+        hookUseOptimistic,
+        hookUseEffectEvent,
+        hookUseStateEvent,
+        hookUseDebugValue,
+        hookPortal,
+      ],
+    },
   ],
 };

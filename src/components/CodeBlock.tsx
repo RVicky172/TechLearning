@@ -25,12 +25,15 @@ export function CodeBlock({ code, language = "javascript" }: Props) {
 
   return (
     <Highlight code={code.trimEnd()} language={prismLang} theme={prismTheme}>
-      {({ style, tokens, getLineProps, getTokenProps }) => (
-        <pre
-          className="bg-(--bg-code) p-5 overflow-x-auto text-xs leading-relaxed"
-          // Override the theme's own background so our CSS token controls it
-          style={{ ...style, background: "transparent" }}
-        >
+      {({ style, tokens, getLineProps, getTokenProps }) => {
+        const { background, backgroundColor, ...preStyle } = style;
+
+        return (
+          <pre
+            className="bg-(--bg-code) p-5 overflow-x-auto text-xs leading-relaxed"
+            // Let CSS token classes control the surface background.
+            style={preStyle}
+          >
           {tokens.map((line, i) => (
             <div key={i} {...getLineProps({ line })}>
               {line.map((token, key) => (
@@ -38,8 +41,9 @@ export function CodeBlock({ code, language = "javascript" }: Props) {
               ))}
             </div>
           ))}
-        </pre>
-      )}
+          </pre>
+        );
+      }}
     </Highlight>
   );
 }

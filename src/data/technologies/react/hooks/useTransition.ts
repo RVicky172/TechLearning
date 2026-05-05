@@ -4,6 +4,7 @@ export const hookUseTransition: TopicNode = {
   id: "hook-usetransition",
   title: "useTransition & useDeferredValue",
   iconName: "Timer",
+  demoComponentKey: "useTransitionDeferred",
   link: "https://react.dev/reference/react/useTransition",
   theory:
     "React 18 introduced concurrent rendering — the ability to interrupt, pause and resume renders. useTransition and useDeferredValue are the two hooks that let you mark state updates as low-priority (non-urgent) so React can keep the UI responsive while the expensive update is in progress.",
@@ -23,65 +24,56 @@ export const hookUseTransition: TopicNode = {
     ],
     examples: [
       {
-        title: "useTransition — keep input responsive during slow list filter",
-        description: "Type in an input without lag even while a large list re-renders.",
-        code: `import { useState, useTransition } from 'react';
+        title: "UseTransitionDemo.tsx",
+        description: "Exact source from react/src/components/hooks/UseTransitionDemo.tsx",
+        code: `import { useState, useTransition } from 'react'
+import { useRenderCount } from '../../hooks/useRenderCount'
 
-const ITEMS = Array.from({ length: 20_000 }, (_, i) => \`Item \${i}\`);
-
-function SlowList({ filter }) {
-  const shown = ITEMS.filter(i => i.includes(filter));
-  return <ul>{shown.map(i => <li key={i}>{i}</li>)}</ul>;
-}
-
-function FilteredPage() {
-  const [input, setInput]   = useState('');
-  const [filter, setFilter] = useState('');
-  const [isPending, startTransition] = useTransition();
-
-  const handleChange = (e) => {
-    setInput(e.target.value);           // urgent — updates immediately
-    startTransition(() => {
-      setFilter(e.target.value);        // non-urgent — can be interrupted
-    });
-  };
+export function UseTransitionDemo() {
+  const renderCount = useRenderCount()
+  const [view, setView] = useState<'stats' | 'preview'>('stats')
+  const [isPending, startTransition] = useTransition()
 
   return (
-    <>
-      <input value={input} onChange={handleChange} placeholder="Filter…" />
-      {isPending && <span>Updating list…</span>}
-      <SlowList filter={filter} />
-    </>
-  );
+    <article>
+      <h2>useTransition</h2>
+      <p className="render-badge">Render count: {renderCount}</p>
+      <p>Marks view switches as low-priority updates.</p>
+      <div className="row">
+        <button type="button" onClick={() => startTransition(() => setView('stats'))}>
+          Stats
+        </button>
+        <button type="button" onClick={() => startTransition(() => setView('preview'))}>
+          Preview
+        </button>
+      </div>
+      <p className="muted">{isPending ? 'Transitioning...' : \`Current: \${view}\`}</p>
+    </article>
+  )
 }`,
-        language: "jsx",
+        language: "tsx",
       },
       {
-        title: "useDeferredValue — debounce a derived render",
-        description: "Defer the expensive child render without controlling the state update yourself.",
-        code: `import { useState, useDeferredValue, memo } from 'react';
+        title: "useRenderCount.ts",
+        description: "Exact source from react/src/hooks/useRenderCount.ts",
+        code: `import { useEffect, useId } from 'react'
 
-const HeavyResults = memo(function HeavyResults({ query }) {
-  // simulate slow render
-  const items = Array.from({ length: 5000 }, (_, i) => \`\${query} result \${i}\`);
-  return <ul>{items.slice(0, 20).map(i => <li key={i}>{i}</li>)}</ul>;
-});
+const renderCountStore = new Map<string, number>()
 
-function Search() {
-  const [query, setQuery] = useState('');
-  const deferred = useDeferredValue(query);   // lags behind during typing
-  const isStale = query !== deferred;
+export function useRenderCount() {
+  const id = useId()
+  const nextCount = (renderCountStore.get(id) ?? 0) + 1
+  renderCountStore.set(id, nextCount)
 
-  return (
-    <>
-      <input value={query} onChange={e => setQuery(e.target.value)} />
-      <div style={{ opacity: isStale ? 0.5 : 1 }}>
-        <HeavyResults query={deferred} />
-      </div>
-    </>
-  );
+  useEffect(() => {
+    return () => {
+      renderCountStore.delete(id)
+    }
+  }, [id])
+
+  return nextCount
 }`,
-        language: "jsx",
+        language: "ts",
       },
     ],
   },

@@ -9,6 +9,12 @@ import { ExternalLink, CheckCircle, ChevronRight, BookOpen } from "lucide-react"
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CodeBlock } from "@/components/CodeBlock";
+import dynamic from "next/dynamic";
+
+const HookDemoRenderer = dynamic(
+  () => import("@/components/react-hooks/HookDemoRenderer").then(m => m.HookDemoRenderer),
+  { ssr: false }
+);
 
 type LucideIcon = ComponentType<{ className?: string }>;
 const iconMap = Icons as unknown as Record<string, LucideIcon | undefined>;
@@ -300,6 +306,10 @@ function TopicSection({ node, techId }: { node: TopicNode; techId: string }) {
             </div>
           ))}
         </div>
+      )}
+
+      {!hasChildren && techId === "react" && node.demoComponentKey && (
+        <HookDemoRenderer demoKey={node.demoComponentKey} />
       )}
     </motion.section>
   );

@@ -4,6 +4,7 @@ export const hookUseLayoutEffect: TopicNode = {
   id: "hook-uselayouteffect",
   title: "useLayoutEffect",
   iconName: "Layout",
+  demoComponentKey: "useLayoutEffect",
   link: "https://react.dev/reference/react/useLayoutEffect",
   theory:
     "useLayoutEffect fires synchronously after React updates the DOM but before the browser paints. It has the same signature as useEffect. Use it only when you need to measure DOM geometry or make synchronous DOM mutations that must happen before the user sees the screen — otherwise prefer useEffect.",
@@ -23,49 +24,57 @@ export const hookUseLayoutEffect: TopicNode = {
     ],
     examples: [
       {
-        title: "Measure element size without flicker",
-        description: "Read the DOM dimensions before paint to position a tooltip accurately.",
-        code: `import { useRef, useState, useLayoutEffect } from 'react';
+        title: "UseLayoutEffectDemo.tsx",
+        description: "Exact source from react/src/components/hooks/UseLayoutEffectDemo.tsx",
+        code: `import { useLayoutEffect, useRef, useState } from 'react'
+import { useRenderCount } from '../../hooks/useRenderCount'
 
-function Tooltip({ text, children }) {
-  const triggerRef = useRef(null);
-  const [pos, setPos] = useState({ top: 0, left: 0 });
+export function UseLayoutEffectDemo() {
+  const renderCount = useRenderCount()
+  const boxRef = useRef<HTMLDivElement>(null)
+  const [width, setWidth] = useState(0)
 
   useLayoutEffect(() => {
-    if (!triggerRef.current) return;
-    const rect = triggerRef.current.getBoundingClientRect();
-    // Set position BEFORE the browser paints — no flicker
-    setPos({ top: rect.bottom + window.scrollY, left: rect.left });
-  });
+    if (!boxRef.current) {
+      return
+    }
+    setWidth(Math.round(boxRef.current.getBoundingClientRect().width))
+  }, [])
 
   return (
-    <>
-      <span ref={triggerRef}>{children}</span>
-      <div style={{ position: 'absolute', top: pos.top, left: pos.left }}
-           className="tooltip">
-        {text}
+    <article>
+      <h2>useLayoutEffect</h2>
+      <p className="render-badge">Render count: {renderCount}</p>
+      <p>Reads layout right after DOM mutations.</p>
+      <div ref={boxRef} className="preview-box">
+        Measured width: {width}px
       </div>
-    </>
-  );
+    </article>
+  )
 }`,
-        language: "jsx",
+        language: "tsx",
       },
       {
-        title: "Scroll to top on route change",
-        description: "Synchronously reset scroll position before the user sees the new page.",
-        code: `import { useLayoutEffect } from 'react';
-import { usePathname } from 'next/navigation';
+        title: "useRenderCount.ts",
+        description: "Exact source from react/src/hooks/useRenderCount.ts",
+        code: `import { useEffect, useId } from 'react'
 
-function ScrollReset() {
-  const pathname = usePathname();
+const renderCountStore = new Map<string, number>()
 
-  useLayoutEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+export function useRenderCount() {
+  const id = useId()
+  const nextCount = (renderCountStore.get(id) ?? 0) + 1
+  renderCountStore.set(id, nextCount)
 
-  return null;
+  useEffect(() => {
+    return () => {
+      renderCountStore.delete(id)
+    }
+  }, [id])
+
+  return nextCount
 }`,
-        language: "jsx",
+        language: "ts",
       },
     ],
   },

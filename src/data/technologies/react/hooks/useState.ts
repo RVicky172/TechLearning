@@ -4,6 +4,7 @@ export const hookUseState: TopicNode = {
   id: "hook-usestate",
   title: "useState",
   iconName: "ToggleLeft",
+  demoComponentKey: "useState",
   link: "https://react.dev/reference/react/useState",
   theory:
     "useState is the fundamental hook for adding local, reactive memory to a function component. Every call returns a stable [value, setter] pair — calling the setter schedules a re-render with the new value.",
@@ -24,62 +25,84 @@ export const hookUseState: TopicNode = {
     ],
     examples: [
       {
-        title: "Counter — basic update",
-        description: "Increment, decrement and reset using the setter with an updater function.",
-        code: `import { useState } from 'react';
+        title: "UseStateDemo.tsx",
+        description: "Exact source from react/src/components/hooks/UseStateDemo.tsx",
+        code: `import { useState } from 'react'
+import { useLocalStorageState } from '../../hooks/useLocalStorageState'
+import { useRenderCount } from '../../hooks/useRenderCount'
 
-function Counter() {
-  const [count, setCount] = useState(0);
-
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(c => c + 1)}>+1</button>
-      <button onClick={() => setCount(c => c - 1)}>-1</button>
-      <button onClick={() => setCount(0)}>Reset</button>
-    </div>
-  );
-}`,
-        language: "jsx",
-      },
-      {
-        title: "Object state — always spread",
-        description: "When state is an object, spread the previous value to avoid wiping unrelated fields.",
-        code: `import { useState } from 'react';
-
-function ProfileForm() {
-  const [profile, setProfile] = useState({ name: '', bio: '', age: 0 });
-
-  const update = (field, value) =>
-    setProfile(prev => ({ ...prev, [field]: value }));
+export function UseStateDemo() {
+  const renderCount = useRenderCount()
+  const [count, setCount] = useState(0)
+  const [note, setNote] = useLocalStorageState('hooks-note', 'Persistent note from custom hook')
 
   return (
-    <>
-      <input value={profile.name}
-             onChange={e => update('name', e.target.value)}
-             placeholder="Name" />
-      <textarea value={profile.bio}
-                onChange={e => update('bio', e.target.value)}
-                placeholder="Bio" />
-      <input type="number" value={profile.age}
-             onChange={e => update('age', +e.target.value)} />
-    </>
-  );
+    <article>
+      <h2>useState</h2>
+      <p className="render-badge">Render count: {renderCount}</p>
+      <p>Basic local state updates and reset.</p>
+      <div className="row">
+        <button type="button" onClick={() => setCount((value) => value + 1)}>
+          Clicked: {count}
+        </button>
+        <button type="button" onClick={() => setCount(0)}>
+          Reset
+        </button>
+      </div>
+      <input value={note} onChange={(event) => setNote(event.target.value)} />
+      <p className="muted">Saved by custom hook: useLocalStorageState</p>
+    </article>
+  )
 }`,
-        language: "jsx",
+        language: "tsx",
       },
       {
-        title: "Lazy initialisation",
-        description: "Pass a function to useState to avoid running expensive work on every render.",
-        code: `import { useState } from 'react';
+        title: "useLocalStorageState.ts",
+        description: "Exact source from react/src/hooks/useLocalStorageState.ts",
+        code: `import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 
-function DataTable({ rawRows }) {
-  // processRows runs ONCE on mount, not on every re-render
-  const [rows, setRows] = useState(() => processRows(rawRows));
+export function useLocalStorageState<T>(key: string, initialValue: T): [T, Dispatch<SetStateAction<T>>] {
+  const [value, setValue] = useState<T>(() => {
+    const raw = localStorage.getItem(key)
+    if (!raw) {
+      return initialValue
+    }
+    try {
+      return JSON.parse(raw) as T
+    } catch {
+      return initialValue
+    }
+  })
 
-  return <table>{rows.map(r => <tr key={r.id}><td>{r.name}</td></tr>)}</table>;
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value))
+  }, [key, value])
+
+  return [value, setValue]
 }`,
-        language: "jsx",
+        language: "ts",
+      },
+      {
+        title: "useRenderCount.ts",
+        description: "Exact source from react/src/hooks/useRenderCount.ts",
+        code: `import { useEffect, useId } from 'react'
+
+const renderCountStore = new Map<string, number>()
+
+export function useRenderCount() {
+  const id = useId()
+  const nextCount = (renderCountStore.get(id) ?? 0) + 1
+  renderCountStore.set(id, nextCount)
+
+  useEffect(() => {
+    return () => {
+      renderCountStore.delete(id)
+    }
+  }, [id])
+
+  return nextCount
+}`,
+        language: "ts",
       },
     ],
   },

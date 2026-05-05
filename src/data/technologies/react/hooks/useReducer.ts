@@ -4,6 +4,7 @@ export const hookUseReducer: TopicNode = {
   id: "hook-usereducer",
   title: "useReducer",
   iconName: "GitMerge",
+  demoComponentKey: "useReducer",
   link: "https://react.dev/reference/react/useReducer",
   theory:
     "useReducer is an alternative to useState for managing complex state logic. You describe every possible state change as an action object, and a pure reducer function handles each case — identical to the Redux pattern, built into React.",
@@ -24,92 +25,103 @@ export const hookUseReducer: TopicNode = {
     ],
     examples: [
       {
-        title: "Shopping cart reducer",
-        description: "Add, remove and clear items from a cart using typed actions.",
-        code: `import { useReducer } from 'react';
+        title: "UseReducerDemo.tsx",
+        description: "Exact source from react/src/components/hooks/UseReducerDemo.tsx",
+        code: `import { useReducer, useState } from 'react'
+import { useRenderCount } from '../../hooks/useRenderCount'
 
-const initialState = { items: [], total: 0 };
+type Todo = { id: number; text: string; done: boolean }
+type Action =
+  | { type: 'add'; text: string }
+  | { type: 'toggle'; id: number }
+  | { type: 'remove'; id: number }
 
-function cartReducer(state, action) {
+function reducer(state: Todo[], action: Action): Todo[] {
   switch (action.type) {
-    case 'ADD_ITEM':
-      return {
-        items: [...state.items, action.item],
-        total: state.total + action.item.price,
-      };
-    case 'REMOVE_ITEM':
-      const removed = state.items.find(i => i.id === action.id);
-      return {
-        items: state.items.filter(i => i.id !== action.id),
-        total: state.total - (removed?.price ?? 0),
-      };
-    case 'CLEAR':
-      return initialState;
+    case 'add':
+      return [...state, { id: Date.now(), text: action.text, done: false }]
+    case 'toggle':
+      return state.map((todo) =>
+        todo.id === action.id ? { ...todo, done: !todo.done } : todo,
+      )
+    case 'remove':
+      return state.filter((todo) => todo.id !== action.id)
     default:
-      return state;
+      return state
   }
 }
 
-function Cart() {
-  const [cart, dispatch] = useReducer(cartReducer, initialState);
+export function UseReducerDemo() {
+  const renderCount = useRenderCount()
+  const [input, setInput] = useState('')
+  const [todos, dispatch] = useReducer(reducer, [
+    { id: 1, text: 'Build reducer demo', done: true },
+    { id: 2, text: 'Dispatch actions', done: false },
+  ])
 
   return (
-    <div>
-      <p>Items: {cart.items.length} — Total: \${cart.total}</p>
-      <button onClick={() => dispatch({ type: 'ADD_ITEM',
-          item: { id: 1, name: 'Book', price: 12 } })}>
-        Add Book
-      </button>
-      <button onClick={() => dispatch({ type: 'CLEAR' })}>
-        Clear cart
-      </button>
-    </div>
-  );
+    <article>
+      <h2>useReducer</h2>
+      <p className="render-badge">Render count: {renderCount}</p>
+      <p>Actions manage list updates in one reducer.</p>
+      <div className="row">
+        <input value={input} onChange={(event) => setInput(event.target.value)} placeholder="Add task" />
+        <button
+          type="button"
+          onClick={() => {
+            if (!input.trim()) {
+              return
+            }
+            dispatch({ type: 'add', text: input.trim() })
+            setInput('')
+          }}
+        >
+          Add
+        </button>
+      </div>
+      <ul>
+        {todos.map((todo) => (
+          <li key={todo.id}>
+            <label>
+              <input
+                type="checkbox"
+                checked={todo.done}
+                onChange={() => dispatch({ type: 'toggle', id: todo.id })}
+              />
+              <span>{todo.text}</span>
+            </label>
+            <button type="button" onClick={() => dispatch({ type: 'remove', id: todo.id })}>
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
+    </article>
+  )
 }`,
-        language: "jsx",
+        language: "tsx",
       },
       {
-        title: "Form validation state",
-        description: "Manage a multi-field form with validation errors as a reducer.",
-        code: `import { useReducer } from 'react';
+        title: "useRenderCount.ts",
+        description: "Exact source from react/src/hooks/useRenderCount.ts",
+        code: `import { useEffect, useId } from 'react'
 
-const init = { values: { email: '', password: '' }, errors: {}, submitted: false };
+const renderCountStore = new Map<string, number>()
 
-function formReducer(state, action) {
-  switch (action.type) {
-    case 'SET_FIELD':
-      return { ...state, values: { ...state.values, [action.field]: action.value },
-               errors: { ...state.errors, [action.field]: '' } };
-    case 'SET_ERROR':
-      return { ...state, errors: { ...state.errors, [action.field]: action.message } };
-    case 'SUBMIT':
-      return { ...state, submitted: true };
-    default:
-      return state;
-  }
-}
+export function useRenderCount() {
+  const id = useId()
+  const nextCount = (renderCountStore.get(id) ?? 0) + 1
+  renderCountStore.set(id, nextCount)
 
-function SignupForm() {
-  const [form, dispatch] = useReducer(formReducer, init);
+  useEffect(() => {
+    return () => {
+      renderCountStore.delete(id)
+    }
+  }, [id])
 
-  const submit = (e) => {
-    e.preventDefault();
-    if (!form.values.email.includes('@'))
-      return dispatch({ type: 'SET_ERROR', field: 'email', message: 'Invalid email' });
-    dispatch({ type: 'SUBMIT' });
-  };
-
-  return (
-    <form onSubmit={submit}>
-      <input value={form.values.email}
-             onChange={e => dispatch({ type: 'SET_FIELD', field: 'email', value: e.target.value })}
-             placeholder="Email" />
-      {form.errors.email && <span>{form.errors.email}</span>}
-      <button type="submit">Sign up</button>
-    </form>
-  );
+  return nextCount
 }`,
-        language: "jsx",
+        language: "ts",
       },
     ],
   },

@@ -14,6 +14,7 @@ export type TopicNode = {
   id: string;
   title: string;
   iconName?: string;
+  demoComponentKey?: string;
   theory?: string;
   theoryDetail?: TheoryDetail;
   completed?: boolean;

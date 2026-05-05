@@ -4,6 +4,7 @@ export const hookUseMemoCallback: TopicNode = {
   id: "hook-usememo-usecallback",
   title: "useMemo & useCallback",
   iconName: "Cpu",
+  demoComponentKey: "useMemoCallback",
   link: "https://react.dev/reference/react/useMemo",
   theory:
     "useMemo caches the result of an expensive computation between renders. useCallback caches a function reference between renders. Both accept a dependency array — the cached value is reused as long as none of the dependencies change. They exist to prevent unnecessary work and preserve referential equality.",
@@ -24,72 +25,96 @@ export const hookUseMemoCallback: TopicNode = {
     ],
     examples: [
       {
-        title: "useMemo — expensive filter",
-        description: "Re-filter a large list only when the list or search term changes.",
-        code: `import { useState, useMemo } from 'react';
+        title: "UseMemoDemo.tsx",
+        description: "Exact source from react/src/components/hooks/UseMemoDemo.tsx",
+        code: `import { useMemo, useState } from 'react'
+import { useRenderCount } from '../../hooks/useRenderCount'
 
-function ProductList({ products }) {
-  const [search, setSearch] = useState('');
+const bigList = Array.from({ length: 1600 }, (_, index) => \`Item \${index + 1}\`)
 
-  // ✅ Only re-runs when products or search changes
-  const filtered = useMemo(
-    () => products.filter(p =>
-      p.name.toLowerCase().includes(search.toLowerCase())
-    ),
-    [products, search]
-  );
+export function UseMemoDemo() {
+  const renderCount = useRenderCount()
+  const [query, setQuery] = useState('1')
+  const filtered = useMemo(() => {
+    const normalized = query.trim()
+    if (!normalized) {
+      return bigList.slice(0, 20)
+    }
+    return bigList.filter((item) => item.includes(normalized)).slice(0, 20)
+  }, [query])
 
   return (
-    <>
-      <input value={search}
-             onChange={e => setSearch(e.target.value)}
-             placeholder="Search products" />
-      <ul>{filtered.map(p => <li key={p.id}>{p.name}</li>)}</ul>
-    </>
-  );
+    <article>
+      <h2>useMemo</h2>
+      <p className="render-badge">Render count: {renderCount}</p>
+      <p>Caches expensive list filtering.</p>
+      <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filter" />
+      <ul>
+        {filtered.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </article>
+  )
 }`,
-        language: "jsx",
+        language: "tsx",
       },
       {
-        title: "useCallback — stable handler for memoised child",
-        description: "Prevent a child wrapped in React.memo from re-rendering when the parent re-renders.",
-        code: `import { useState, useCallback, memo } from 'react';
+        title: "UseCallbackDemo.tsx",
+        description: "Exact source from react/src/components/hooks/UseCallbackDemo.tsx",
+        code: `import { memo, useCallback, useState } from 'react'
+import { useRenderCount } from '../../hooks/useRenderCount'
 
-// Child only re-renders when its own props change
-const ExpensiveList = memo(function ExpensiveList({ items, onDelete }) {
-  console.log('ExpensiveList rendered');
+const SaveButton = memo(function SaveButton({ onSave }: { onSave: () => void }) {
   return (
-    <ul>
-      {items.map(item => (
-        <li key={item.id}>
-          {item.name}
-          <button onClick={() => onDelete(item.id)}>Remove</button>
-        </li>
-      ))}
-    </ul>
-  );
-});
+    <button type="button" onClick={onSave}>
+      Save note
+    </button>
+  )
+})
 
-function Parent() {
-  const [items, setItems] = useState([
-    { id: 1, name: 'Alpha' },
-    { id: 2, name: 'Beta' },
-  ]);
-  const [other, setOther] = useState(0);
+export function UseCallbackDemo() {
+  const renderCount = useRenderCount()
+  const [note, setNote] = useState('Memoize callbacks passed to children')
 
-  // ✅ Same function reference between renders — won't bust React.memo
-  const handleDelete = useCallback((id) => {
-    setItems(prev => prev.filter(i => i.id !== id));
-  }, []);   // no deps — setItems from useState is always stable
+  const onSave = useCallback(() => {
+    localStorage.setItem('use-callback-note', note)
+    alert('Saved callback payload.')
+  }, [note])
 
   return (
-    <>
-      <button onClick={() => setOther(n => n + 1)}>Unrelated update ({other})</button>
-      <ExpensiveList items={items} onDelete={handleDelete} />
-    </>
-  );
+    <article>
+      <h2>useCallback</h2>
+      <p className="render-badge">Render count: {renderCount}</p>
+      <p>Memoizes callback identity for memoized children.</p>
+      <input value={note} onChange={(event) => setNote(event.target.value)} />
+      <SaveButton onSave={onSave} />
+    </article>
+  )
 }`,
-        language: "jsx",
+        language: "tsx",
+      },
+      {
+        title: "useRenderCount.ts",
+        description: "Exact source from react/src/hooks/useRenderCount.ts",
+        code: `import { useEffect, useId } from 'react'
+
+const renderCountStore = new Map<string, number>()
+
+export function useRenderCount() {
+  const id = useId()
+  const nextCount = (renderCountStore.get(id) ?? 0) + 1
+  renderCountStore.set(id, nextCount)
+
+  useEffect(() => {
+    return () => {
+      renderCountStore.delete(id)
+    }
+  }, [id])
+
+  return nextCount
+}`,
+        language: "ts",
       },
     ],
   },
