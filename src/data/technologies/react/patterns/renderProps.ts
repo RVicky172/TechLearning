@@ -4,6 +4,7 @@ export const renderProps: TopicNode = {
   id: "react-render-props",
   title: "Render Props",
   iconName: "FunctionSquare",
+  demoComponentKey: "renderPropsDemo",
   link: "https://react.dev/reference/react/cloneElement#passing-data-with-a-render-prop",
   theory:
     "The render props pattern shares stateful logic between components by passing a function as a prop (or as children). The function receives data or state from the wrapper and returns JSX. The parent component handles 'what' data to manage; the passed function decides 'how' to render it.",

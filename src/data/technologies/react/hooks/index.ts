@@ -9,6 +9,7 @@ import { effectAlternatives } from "./effectAlternatives";
 import { hookUseLayoutEffect } from "./useLayoutEffect";
 import { hookUseTransition } from "./useTransition";
 import { hookCustom } from "./custom";
+import { customHooksReal } from "./customHooksReal";
 import {
   hookPortal,
   hookRefAsProp,
@@ -53,7 +54,7 @@ export const reactHooks: TopicNode = {
       title: "Core Hooks",
       iconName: "Layers",
       theory: "State, context, and references that power most day-to-day React components.",
-      children: [hookUseState, hookUseReducer, hookUseRef, hookUseContext, hookCustom],
+      children: [hookUseState, hookUseReducer, hookUseRef, hookUseContext, hookCustom, customHooksReal],
     },
     {
       id: "react-hooks-effects",

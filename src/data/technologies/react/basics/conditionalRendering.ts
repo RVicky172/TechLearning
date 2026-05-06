@@ -4,6 +4,7 @@ export const conditionalRendering: TopicNode = {
   id: "react-conditional-rendering",
   title: "Conditional Rendering",
   iconName: "GitBranch",
+  demoComponentKey: "conditionalRendering",
   link: "https://react.dev/learn/conditional-rendering",
   theory:
     "React components can decide what JSX to return based on conditions — just like regular JavaScript if/else. Because JSX is expressions, you can inline conditionals using the ternary operator, short-circuit &&, or early returns to produce different output from the same component.",

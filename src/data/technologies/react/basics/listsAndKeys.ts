@@ -4,6 +4,7 @@ export const listsAndKeys: TopicNode = {
   id: "react-lists-keys",
   title: "Lists & Keys",
   iconName: "List",
+  demoComponentKey: "reactLists",
   link: "https://react.dev/learn/rendering-lists",
   theory:
     "Rendering a list in React means mapping over an array and returning JSX for each item. React requires each item in a list to have a unique key prop so it can efficiently identify what changed, was added, or was removed when the list updates.",

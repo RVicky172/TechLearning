@@ -16,6 +16,13 @@ function SidebarIcon({ name, className }: { name: string; className: string }) {
   if (!Icon) return null;
   return createElement(Icon, { className });
 }
+
+/** Recursively check if a node or any of its descendants has the given id */
+function treeContainsTopic(node: TopicNode, topicId: string): boolean {
+  if (node.id === topicId) return true;
+  return node.children?.some(child => treeContainsTopic(child, topicId)) ?? false;
+}
+
 function SidebarTreeNode({ node, depth = 0, techId, activeTopic, onToggle, expandedId }: { node: TopicNode; depth?: number; techId: string; activeTopic: string | null; onToggle?: (id: string) => void; expandedId?: string | null }) {
   const isActive = node.id === activeTopic;
   const isExpanded = depth === 0 ? expandedId === node.id : true;
@@ -69,7 +76,25 @@ export function Sidebar() {
   const techMatch = pathname.match(/^\/tech\/([^/]+)/);
   const currentTechId = techMatch?.[1];
   const currentTech = currentTechId ? technologies.find(t => t.id === currentTechId) : null;
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  // Compute initial expandedId from the URL's topic on first render
+  const [expandedId, setExpandedId] = useState<string | null>(() => {
+    if (!activeTopic || !currentTech) return null;
+    const parentNode = currentTech.tree.find(node => treeContainsTopic(node, activeTopic));
+    return parentNode?.id ?? null;
+  });
+
+  // Auto-expand when activeTopic changes via navigation (React-recommended
+  // "adjust state during render" pattern — no useEffect needed)
+  const [prevActiveTopic, setPrevActiveTopic] = useState<string | null>(activeTopic);
+  if (activeTopic !== prevActiveTopic) {
+    setPrevActiveTopic(activeTopic);
+    if (activeTopic && currentTech) {
+      const parentNode = currentTech.tree.find(node => treeContainsTopic(node, activeTopic));
+      if (parentNode) {
+        setExpandedId(parentNode.id);
+      }
+    }
+  }
 
   const handleToggle = (id: string) => {
     setExpandedId(expandedId === id ? null : id);

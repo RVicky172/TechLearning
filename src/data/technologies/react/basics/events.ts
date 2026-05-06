@@ -4,6 +4,7 @@ export const events: TopicNode = {
   id: "react-events",
   title: "Event Handling",
   iconName: "MousePointerClick",
+  demoComponentKey: "reactEvents",
   link: "https://react.dev/learn/responding-to-events",
   theory:
     "React event handlers are functions that respond to user interactions like clicks, form submissions, and keyboard input. React uses a unified synthetic event system that wraps native browser events, ensuring consistent behavior across all browsers. Always pass event handlers as function references (not invoked with parentheses).",

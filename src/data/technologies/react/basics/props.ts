@@ -4,6 +4,7 @@ export const props: TopicNode = {
   id: "react-props",
   title: "Props & Data Flow",
   iconName: "ArrowRightLeft",
+  demoComponentKey: "reactProps",
   link: "https://react.dev/learn/passing-props-to-a-component",
   theory:
     "Props are how you pass data from a parent component to a child component. They are immutable and flow in only one direction (downward). React enforces this constraint to make your data flow transparent — you always know where state comes from and how it gets updated.",

@@ -4,6 +4,7 @@ export const errorBoundaries: TopicNode = {
   id: "react-error-boundaries",
   title: "Error Boundaries",
   iconName: "AlertTriangle",
+  demoComponentKey: "errorBoundary",
   link: "https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary",
   theory:
     "An Error Boundary is a class component that catches JavaScript errors in its child tree during rendering, in lifecycle methods, and in constructors. It prevents a single broken component from crashing the entire app by rendering a fallback UI instead.",

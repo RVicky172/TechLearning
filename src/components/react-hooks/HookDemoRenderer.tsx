@@ -13,6 +13,32 @@ import { UseSyncExternalStoreDemo, UseDebugValueDemo } from "./demos/external";
 import { UseInsertionEffectDemo, UseActionStateDemo, UseOptimisticDemo } from "./demos/serverActions";
 import { UseEffectEventDemo, UseStateEventDemo, UseWithProviderDemo } from "./demos/eventUtils";
 import { RefAsPropDemo, PortalDemo } from "./demos/refs";
+import { ThrottlingDebouncingDemo } from "./demos/throttlingDebouncing";
+// Basics
+import {
+  ConditionalRenderingDemo,
+  ReactEventsDemo,
+  ReactFormsDemo,
+  ReactListsDemo,
+  ReactPropsDemo,
+  PropDrillingDemo,
+} from "./demos/basicInteraction";
+// Advanced
+import {
+  ReactPerformanceDemo,
+  ReactBatchingDemo,
+  AdvancedContextDemo,
+  UseReducerCartDemo,
+  OptimisticUpdatesDemo,
+  ErrorBoundaryDemo,
+} from "./demos/advancedDemos";
+// Patterns
+import {
+  CompoundComponentsDemo,
+  HOCDemo,
+  RenderPropsDemo,
+  CustomHooksRealDemo,
+} from "./demos/patternDemos";
 
 type HookDemoKey =
   | "createCustomHookGuide"
@@ -36,13 +62,34 @@ type HookDemoKey =
   | "useEffectEvent"
   | "useStateEvent"
   | "refAsProp"
-  | "portal";
+  | "portal"
+  | "throttlingDebouncing"
+  // Basics
+  | "conditionalRendering"
+  | "reactEvents"
+  | "reactForms"
+  | "reactLists"
+  | "reactProps"
+  | "propDrilling"
+  // Advanced
+  | "reactPerformance"
+  | "reactBatching"
+  | "advancedContext"
+  | "useReducerCart"
+  | "reactOptimistic"
+  | "errorBoundary"
+  // Patterns
+  | "compoundComponents"
+  | "hocDemo"
+  | "renderPropsDemo"
+  | "customHooksReal";
 
 type HookDemoRendererProps = {
   demoKey: string;
 };
 
 const demoMap: Record<HookDemoKey, () => React.ReactNode> = {
+  // Existing hooks
   createCustomHookGuide: CreateCustomHookGuideDemo,
   useState: UseStateDemo,
   useEffect: UseEffectDemo,
@@ -65,6 +112,26 @@ const demoMap: Record<HookDemoKey, () => React.ReactNode> = {
   useStateEvent: UseStateEventDemo,
   refAsProp: RefAsPropDemo,
   portal: PortalDemo,
+  throttlingDebouncing: ThrottlingDebouncingDemo,
+  // Basics
+  conditionalRendering: ConditionalRenderingDemo,
+  reactEvents: ReactEventsDemo,
+  reactForms: ReactFormsDemo,
+  reactLists: ReactListsDemo,
+  reactProps: ReactPropsDemo,
+  propDrilling: PropDrillingDemo,
+  // Advanced
+  reactPerformance: ReactPerformanceDemo,
+  reactBatching: ReactBatchingDemo,
+  advancedContext: AdvancedContextDemo,
+  useReducerCart: UseReducerCartDemo,
+  reactOptimistic: OptimisticUpdatesDemo,
+  errorBoundary: ErrorBoundaryDemo,
+  // Patterns
+  compoundComponents: CompoundComponentsDemo,
+  hocDemo: HOCDemo,
+  renderPropsDemo: RenderPropsDemo,
+  customHooksReal: CustomHooksRealDemo,
 };
 
 export function HookDemoRenderer({ demoKey }: HookDemoRendererProps) {

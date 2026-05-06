@@ -4,6 +4,7 @@ export const batching: TopicNode = {
   id: "react-batching",
   title: "Batching & State Updates",
   iconName: "Zap",
+  demoComponentKey: "reactBatching",
   link: "https://react.dev/learn/queueing-a-series-of-state-updates",
   theory:
     "Batching combines multiple state updates into a single render and commit cycle, reducing renders and improving performance. React 18 automatically batches updates in most cases (events, promises, timers), but sometimes you need to flush updates synchronously with flushSync() or see updates individually.",

@@ -4,6 +4,7 @@ export const context: TopicNode = {
     id: "react-context",
     title: "Context API",
     iconName: "Share2",
+  demoComponentKey: "advancedContext",
     link: "https://react.dev/learn/passing-data-deeply-with-context",
     theory:
         "Context lets you pass data through the component tree without passing props at every level. It's ideal for global state like themes, authentication, or user preferences. Context is consumed with useContext, and updates trigger re-renders of all consumers.",

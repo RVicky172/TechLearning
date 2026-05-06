@@ -4,6 +4,7 @@ export const hoc: TopicNode = {
   id: "react-hoc",
   title: "Higher-Order Components",
   iconName: "Layers",
+  demoComponentKey: "hocDemo",
   link: "https://react.dev/learn/reusing-logic-with-custom-hooks",
   theory:
     "A Higher-Order Component (HOC) is a function that takes a component and returns a new, enhanced component. It's a pattern for reusing component logic — the HOC wraps the original, injecting extra props, state, or behaviour without modifying the source component.",

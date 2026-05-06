@@ -4,6 +4,7 @@ export const performance: TopicNode = {
   id: "react-performance",
   title: "Performance Optimization",
   iconName: "Gauge",
+  demoComponentKey: "reactPerformance",
   link: "https://react.dev/learn/render-and-commit",
   theory:
     "React re-renders when state changes, but not all re-renders are necessary. The memoization tools — useMemo, useCallback, and React.memo — let you skip rendering components that haven't changed. However, premature optimization adds complexity, so always profile before optimizing.",

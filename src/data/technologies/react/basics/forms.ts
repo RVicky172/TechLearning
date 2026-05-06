@@ -4,6 +4,7 @@ export const forms: TopicNode = {
   id: "react-forms",
   title: "Forms & Controlled Inputs",
   iconName: "FormInput",
+  demoComponentKey: "reactForms",
   link: "https://react.dev/learn/reacting-to-input-with-state",
   theory:
     "A controlled input is one whose value is driven by React state. The component owns the value, and every keystroke calls a handler that updates state, which flows back into the input. This makes the state the single source of truth, enabling validation, formatting, and programmatic clearing at any time.",

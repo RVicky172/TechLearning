@@ -4,6 +4,7 @@ export const propsDrilling: TopicNode = {
   id: "react-props-drilling",
   title: "Props Drilling",
   iconName: "ArrowDownToLine",
+  demoComponentKey: "propDrilling",
   link: "https://react.dev/learn/passing-data-deeply-with-context",
   theory:
     "Props drilling is the practice of passing data through multiple layers of components that don't need it themselves, just to get it to a deeply nested child. It works but creates tight coupling — every intermediate component must forward a prop it doesn't use. Context, composition, or state managers solve the root problem.",
