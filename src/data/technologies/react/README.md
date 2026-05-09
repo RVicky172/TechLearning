@@ -8,6 +8,7 @@ This folder contains all learning content for the React technology. Content is s
 react/
 ├── index.ts
 ├── interviewQuestions.ts
+├── performanceOptimization.ts
 ├── README.md
 │
 ├── basics/
@@ -73,10 +74,18 @@ Top-level order in `react/index.ts`:
 
 1. Basics of React
 2. React Hooks
-3. Advanced Concepts
-4. Patterns & Techniques
-5. React Ecosystem
-6. Interview Questions
+3. React Performance & Optimization
+4. Advanced Concepts
+5. Patterns & Techniques
+6. React Ecosystem
+7. Interview Questions
+
+### React Performance & Optimization
+
+- Optimization Playbook
+- Rendering and Memoization
+- Lists, Virtualization, and Windowing
+- Concurrency and Perceived Performance
 
 ### Basics of React
 

@@ -349,46 +349,74 @@ const handleSearch = async (q) => {
             language: "tsx",
           },
           {
-            title: "Q: Optimize a List with 10,000 Items (Virtualization)",
+            title: "Q: Virtualized List - Efficiently Render 10,000 Items",
             description:
-              "Rendering 10k items causes jank. Solution: virtualization libraries (react-window, react-virtualized) render only visible items in viewport.",
-            code: `// Naive approach (slow)
-function HugeList({ items }) {
+              "Problem: Efficiently render 10,000 items without crashing the browser. Expected interview answer: avoid rendering all rows at once; use react-window (or custom windowing) so only visible rows are mounted.",
+            code: `// Problem:
+// Render 10,000 rows smoothly without browser jank or memory spikes.
+
+import { memo } from 'react';
+import { FixedSizeList, ListChildComponentProps } from 'react-window';
+
+type Item = { id: number; name: string };
+
+const Row = memo(function Row({
+  index,
+  style,
+  data,
+}: ListChildComponentProps<Item[]>) {
+  const item = data[index];
   return (
-    <ul>
-      {items.map(item => <li key={item.id}>{item.name}</li>)}
-    </ul>
+    <div style={style} className="border-b px-3 py-2">
+      #{item.id} - {item.name}
+    </div>
   );
-}
+});
 
-// Optimized approach: Virtualization with react-window
-import { FixedSizeList } from 'react-window';
+export function VirtualizedListExample() {
+  const items: Item[] = Array.from({ length: 10_000 }, (_, i) => ({
+    id: i + 1,
+    name: \`User \${i + 1}\`,
+  }));
 
-function OptimizedList({ items }) {
-  const Row = ({ index, style }) => (
-    <li style={style} key={items[index].id}>
-      {items[index].name}
-    </li>
-  );
-  
   return (
     <FixedSizeList
-      height={600}
+      height={420}      // viewport height
+      width={520}
       itemCount={items.length}
-      itemSize={35}
-      width="100%"
+      itemSize={40}     // fixed row height
+      itemData={items}
+      overscanCount={6} // pre-render near viewport for smoother scroll
     >
       {Row}
     </FixedSizeList>
   );
 }
 
-// Key insights:
-// - Renders only ~20 items in viewport (not 10k)
-// - Huge perf gain with negligible UX difference
-// - Need fixed item height for FixedSizeList
-// - Use VariableSizeList for dynamic heights (more complex)`,
+// Interview-ready solution notes:
+// 1) react-window mounts only visible rows (+ overscan), not all 10,000 rows.
+// 2) DOM node count stays low, reducing memory and layout/paint cost.
+// 3) For variable row heights, use VariableSizeList.
+// 4) If library is not allowed, implement custom windowing with scrollTop + start/end index math.`,
             language: "tsx",
+            output: `VirtualizedListExample (viewport: 420px, row: 40px)
+
+Visible DOM rows at a time: ~10-16 (plus overscan)
+Total dataset size: 10,000 rows
+
+Top of list:
+#1 - User 1
+#2 - User 2
+#3 - User 3
+...
+
+After scrolling to middle:
+#4988 - User 4988
+#4989 - User 4989
+#4990 - User 4990
+...
+
+Result: Smooth scroll, low memory usage, browser remains responsive.`,
           },
           {
             title: "Q: Handle Async Loading States (Pending, Success, Error)",
