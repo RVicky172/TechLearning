@@ -75,6 +75,44 @@ export function useRenderCount() {
 }`,
         language: "ts",
       },
+      {
+        title: "UseDeferredValueDemo.tsx",
+        description: "Exact source from react/src/components/hooks/UseDeferredValueDemo.tsx",
+        code: `import { useDeferredValue, useMemo, useState } from 'react'
+import { useRenderCount } from '../../hooks/useRenderCount'
+
+const dataset = Array.from({ length: 1800 }, (_, index) => \`Hook helper \${index + 1}\`)
+
+export function UseDeferredValueDemo() {
+  const renderCount = useRenderCount()
+  const [search, setSearch] = useState('hook')
+  const deferredSearch = useDeferredValue(search)
+
+  const filtered = useMemo(() => {
+    const query = deferredSearch.toLowerCase().trim()
+    if (!query) {
+      return dataset.slice(0, 20)
+    }
+    return dataset.filter((item) => item.toLowerCase().includes(query)).slice(0, 20)
+  }, [deferredSearch])
+
+  return (
+    <article>
+      <h2>useDeferredValue</h2>
+      <p className="render-badge">Render count: {renderCount}</p>
+      <p>Keeps typing fast while expensive filtering lags behind.</p>
+      <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search" />
+      <p className="muted">Deferred query: {deferredSearch}</p>
+      <ul>
+        {filtered.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </article>
+  )
+}`,
+        language: "tsx",
+      },
     ],
   },
 };

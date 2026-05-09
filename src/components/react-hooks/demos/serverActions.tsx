@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useInsertionEffect, useActionState, useOptimistic } from "react";
+import { startTransition, useState, useInsertionEffect, useActionState, useOptimistic } from "react";
 import { DemoCard, RenderBadge } from "../ui";
 import { useRenderCount } from "../hooks";
 
@@ -89,7 +89,9 @@ export function UseOptimisticDemo() {
         <button
           type="button"
           onClick={() => {
-            addOptimisticLike(1);
+            startTransition(() => {
+              addOptimisticLike(1);
+            });
             setTimeout(() => setLikes(value => value + 1), 700);
           }}
           className="rounded-lg border border-(--border) px-3 py-1.5 text-(--text-1) hover:bg-(--bg-elevated)"
