@@ -107,6 +107,105 @@ Append to the `technologies` array. All fields are required except `theory`, `li
 
 ---
 
+## Multi-File Technology Pattern
+
+Technologies with more than a few topic nodes **must** be split into individual section files rather than a single monolithic `index.ts`. This is the established pattern for `typescript/`, `react/`, `javascript/`, and others.
+
+### Directory structure
+
+```
+src/data/technologies/<tech>/
+  index.ts            ← thin assembler only — no topic data goes here
+  fundamentals.ts     ← one TopicNode per file
+  advanced.ts
+  functions.ts
+  ...
+```
+
+### Section file rules
+
+- Each file exports exactly **one named `TopicNode` constant** using camelCase:
+  ```typescript
+  import type { TopicNode } from "@/data/types";
+  
+  export const tsFundamentals: TopicNode = {
+    id: "ts-basics",
+    title: "TypeScript Fundamentals",
+    // ...
+  };
+  ```
+- **Naming convention**: export name = `<techPrefix><SectionName>` (e.g. `tsFundamentals`, `tsAdvanced`, `reactHooks`)
+- **Filename**: camelCase matching the section name (e.g. `enumsAndLiterals.ts`, `inPractice.ts`, `modulesAndConfig.ts`)
+- `theoryDetail` must include `keyConcepts`, `whyItMatters`, `commonPitfalls`, and at least one `examples[]` entry with `title`, `description`, `code`, and `language`
+- Examples must be production-quality, realistic snippets — not toy `hello world` code
+
+### `index.ts` assembler rules
+
+`index.ts` **must only** contain imports and the `Technology` object — never raw topic data:
+
+```typescript
+import type { Technology } from "@/data/types";
+import { tsFundamentals } from "./fundamentals";
+import { tsAdvanced } from "./advanced";
+
+const typescript: Technology = {
+  id: "typescript",
+  name: "TypeScript",
+  description: "...",
+  color: "bg-blue-700",
+  iconName: "FileCode2",
+  deviconClass: "devicon-typescript-plain colored",
+  tree: [tsFundamentals, tsAdvanced],
+};
+
+export default typescript;
+```
+
+### TypeScript section file map
+
+| File | Export | Node ID |
+|---|---|---|
+| `setup.ts` | `tsSetup` | `ts-setup` |
+| `buildTools.ts` | `tsBuildTools` | `ts-build-tools` |
+| `fileTypes.ts` | `tsFileTypes` | `ts-file-types` |
+| `fundamentals.ts` | `tsFundamentals` | `ts-basics` |
+| `advanced.ts` | `tsAdvanced` | `ts-advanced` |
+| `functions.ts` | `tsFunctions` | `ts-functions` |
+| `classes.ts` | `tsClasses` | `ts-classes` |
+| `enumsAndLiterals.ts` | `tsEnumsAndLiterals` | `ts-enums-literals` |
+| `modulesAndConfig.ts` | `tsModulesAndConfig` | `ts-modules-config` |
+| `inPractice.ts` | `tsInPractice` | `ts-in-practice` |
+| `interviewQuestions.ts` | re-exports from `interviewQuestions/index.ts` | — |
+| `interviewQuestions/index.ts` | `tsInterviewQuestions` | `ts-interview-questions` |
+| `interviewQuestions/easy.ts` | `tsIQEasy` | `ts-iq-easy` |
+| `interviewQuestions/medium.ts` | `tsIQMedium` | `ts-iq-medium` |
+| `interviewQuestions/hard.ts` | `tsIQHard` | `ts-iq-hard` |
+
+### Nested section folders
+
+When a section itself has sub-sections (e.g. Interview Questions split by difficulty), use a sub-folder:
+
+```
+src/data/technologies/<tech>/
+  sectionName/
+    index.ts       ← exports the parent TopicNode, imports easy/medium/hard
+    easy.ts        ← exports tsXxxEasy: TopicNode
+    medium.ts      ← exports tsXxxMedium: TopicNode
+    hard.ts        ← exports tsXxxHard: TopicNode
+  sectionName.ts   ← single re-export: export { tsXxx } from "./sectionName/index"
+```
+
+The top-level `sectionName.ts` file is kept as a thin re-export so the main `index.ts` import path (`"./sectionName"`) never needs to change.
+
+### Editing existing topics
+
+- To edit a topic node: open the **section file** for that node (not `index.ts`)
+- To add a new top-level section: create a new section file, export the `TopicNode`, then import and append it to `tree` in `index.ts`
+- To add a child topic: find the section file by matching the node ID prefix and edit `children[]` there
+- **Never** copy topic data into `index.ts` — it defeats the purpose of the split
+
+---
+
 ## Design System
 
 ### Theme System
