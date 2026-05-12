@@ -1,143 +1,6 @@
 import type { TopicNode } from "@/data/types";
 
-const transitions: TopicNode = {
-  id: "css-transitions",
-  title: "Transitions",
-  iconName: "ArrowRightLeft",
-  link: "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_transitions",
-  theory:
-    "Transitions interpolate a CSS property from one value to another over a set duration when a change is triggered (e.g. by :hover or a class change via JavaScript).",
-  theoryDetail: {
-    keyConcepts: [
-      "transition: property duration easing delay — each part is optional except duration",
-      "Comma-separate multiple transitions: transition: color 0.2s ease, transform 0.3s ease",
-      "Easing functions: ease, linear, ease-in, ease-out, ease-in-out, cubic-bezier(x1,y1,x2,y2)",
-      "transition: all is convenient but expensive — explicitly list only the properties that change",
-      "CSS transition-behavior: allow-discrete enables transitioning discrete properties like display",
-    ],
-    whyItMatters:
-      "Hover states, focus rings, and theme switches all benefit from smooth transitions. A 200–300ms ease transition turns abrupt flips into polished micro-interactions with two lines of CSS.",
-    commonPitfalls: [
-      "Transitioning display: none — it is not animatable; use opacity or visibility instead",
-      "Using durations longer than 500ms — the UI starts to feel sluggish",
-      "Applying will-change: transform globally — overusing it wastes GPU memory",
-    ],
-    examples: [
-      {
-        title: "Button micro-interactions",
-        description: "Smooth hover and focus states with multiple property transitions.",
-        code: `/* HTML: <button class="btn">Save Changes</button> */
-
-.btn {
-  background: var(--color-primary, #3b82f6);
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-
-  /* Explicitly list ONLY the properties that change */
-  transition:
-    background  0.2s ease,
-    transform   0.15s ease,
-    box-shadow  0.2s ease;
-}
-
-.btn:hover {
-  background: #2563eb;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-}
-
-.btn:active {
-  transform: scale(0.97);
-  box-shadow: none;
-}
-
-/* OUTPUT:
-  Default → blue, flat
-  Hover   → darker blue + glow shadow (200ms ease)
-  Click   → slight shrink (150ms ease)
-  Release → returns to hover state */`,
-        language: "css",
-      },
-      {
-        title: "Theme switch transition",
-        description: "Smooth dark/light mode transition across the whole page using custom properties.",
-        code: `/* Apply transition on the token consumers, not on :root */
-body,
-.card,
-.sidebar,
-.header {
-  transition:
-    background-color 0.3s ease,
-    color            0.3s ease,
-    border-color     0.2s ease;
-}
-
-/* Tokens change instantly on :root */
-[data-theme="light"] {
-  --bg-surface: #ffffff;
-  --text-1:     #0f172a;
-  --border:     #e2e8f0;
-}
-
-[data-theme="dark"] {
-  --bg-surface: #1e293b;
-  --text-1:     #f1f5f9;
-  --border:     #334155;
-}
-
-/* OUTPUT: toggling data-theme on <html> triggers a smooth
-   300ms crossfade across all themed surfaces */`,
-        language: "css",
-      },
-      {
-        title: "Transitioning height (the accordion problem)",
-        description:
-          "height: auto cannot be transitioned directly. Use max-height or the modern interpolate-size approach.",
-        code: `/* HTML:
-  <div class="accordion">
-    <div class="accordion-content">Long content here...</div>
-  </div>
-*/
-
-/* ─── Classic: max-height trick ─── */
-.accordion-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease;
-}
-
-.accordion.open .accordion-content {
-  max-height: 500px; /* must be larger than actual height */
-}
-/* Downside: the easing applies to max-height, not the
-   visual height, so the animation feels slightly wrong. */
-
-/* ─── Modern: interpolate-size (Chrome 129+) ─── */
-:root {
-  interpolate-size: allow-keywords;
-}
-
-.accordion-content {
-  height: 0;
-  overflow: hidden;
-  transition: height 0.4s ease;
-}
-
-.accordion.open .accordion-content {
-  height: auto; /* now animatable! */
-}
-
-/* OUTPUT: content smoothly expands from 0 to its natural
-   height when the .open class is toggled. */`,
-        language: "css",
-      },
-    ],
-  },
-};
-
-const keyframes: TopicNode = {
+export const cssKeyframes: TopicNode = {
   id: "css-keyframes",
   title: "Keyframe Animations",
   iconName: "PlayCircle",
@@ -173,8 +36,8 @@ const keyframes: TopicNode = {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
+  },
+};
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -210,6 +73,9 @@ const keyframes: TopicNode = {
    300ms→ CTA button starts animating
    Staggered cascade effect, no JavaScript. */`,
         language: "css",
+        preview: {
+          html: `<section><h1 class="hero-title">Launch faster</h1><p class="hero-subtitle">Motion guides the reading order.</p><button class="hero-cta">Get Started</button></section>`,
+        },
       },
       {
         title: "Loading spinner",
@@ -248,6 +114,9 @@ const keyframes: TopicNode = {
   .skeleton { animation: none; opacity: 0.6; }
 }`,
         language: "css",
+        preview: {
+          html: `<div class="preview-stack"><div class="spinner" aria-label="Loading..."></div><div class="skeleton" style="width:180px;height:14px"></div></div>`,
+        },
       },
       {
         title: "Attention-grabbing animation",
@@ -282,6 +151,10 @@ form.addEventListener('submit', (e) => {
 /* OUTPUT: invalid submit → field shakes once, turns red
    Subsequent invalid submits → shakes again each time */`,
         language: "css",
+        preview: {
+          html: `<form><input class="input-error" value="Invalid email" /></form>`,
+          css: `input{padding:10px 12px;border:2px solid #cbd5e1;border-radius:8px}`,
+        },
       },
       {
         title: "Scroll-driven animations (CSS-only)",
@@ -317,31 +190,11 @@ form.addEventListener('submit', (e) => {
   .reveal-on-scroll { opacity: 0; } /* hide initially only if supported */
 }`,
         language: "css",
+        preview: {
+          html: `<div class="preview-stack"><article class="reveal-on-scroll">First reveal card</article><article class="reveal-on-scroll">Second reveal card</article><article class="reveal-on-scroll">Third reveal card</article></div>`,
+          css: `.reveal-on-scroll{padding:16px;border-radius:12px;background:white;border:1px solid #cbd5e1}`,
+        },
       },
     ],
   },
-};
-
-export const cssAnimations: TopicNode = {
-  id: "css-animations",
-  title: "Animations & Transitions",
-  iconName: "Zap",
-  theory:
-    "CSS transitions animate property changes smoothly. Keyframe animations run independently of state changes. Both should respect prefers-reduced-motion to protect users with vestibular disorders.",
-  theoryDetail: {
-    keyConcepts: [
-      "Transitions: triggered by state changes (:hover, class toggle) — simple two-value interpolation",
-      "Keyframes: run on load or programmatically — multi-step, timing-controlled sequences",
-      "Animate transform and opacity for GPU-composited, jank-free animations",
-      "Always provide a prefers-reduced-motion alternative for infinite or large animations",
-    ],
-    whyItMatters:
-      "Motion gives users feedback about state changes and guides attention. Subtle transitions make UIs feel polished. Done carelessly, animations create accessibility issues and performance problems.",
-    commonPitfalls: [
-      "Animating layout properties (height, margin, top) causing costly reflows on every frame",
-      "Not wrapping animations in @media (prefers-reduced-motion: reduce)",
-      "Using animation-fill-mode: forwards without understanding it keeps the final keyframe applied permanently",
-    ],
-  },
-  children: [transitions, keyframes],
 };

@@ -2,12 +2,23 @@ export type TheoryDetail = {
   keyConcepts?: string[];
   whyItMatters?: string;
   commonPitfalls?: string[];
+  comparisons?: Array<{
+    title: string;
+    summary?: string;
+    points: string[];
+  }>;
   examples?: Array<{
     title: string;
     description: string;
     code: string;
     language?: string;
-    /** Visual output block shown below the code — ASCII/text preview of the rendered result */
+    preview?: {
+      html?: string;
+      css?: string;
+      javascript?: string;
+      height?: number;
+    };
+    /** Legacy fallback for text-only preview content. Prefer preview for CSS examples. */
     output?: string;
   }>;
 };

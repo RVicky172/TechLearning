@@ -9,6 +9,7 @@ import { ExternalLink, CheckCircle, ChevronRight, BookOpen } from "lucide-react"
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CssPreview } from "@/components/CssPreview";
 import dynamic from "next/dynamic";
 
 const HookDemoRenderer = dynamic(
@@ -220,7 +221,8 @@ function TopicSection({ node, techId }: { node: TopicNode; techId: string }) {
           </a>
         )}
         {node.theoryDetail && (
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="mt-6 space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {node.theoryDetail.keyConcepts && node.theoryDetail.keyConcepts.length > 0 && (
               <div className="min-w-0 bg-(--accent-subtle) border border-(--accent-subtle) rounded-xl p-5 md:p-6">
                 <h4 className="text-xs font-semibold text-(--accent-fg) uppercase tracking-wider mb-4">Key Concepts</h4>
@@ -251,6 +253,30 @@ function TopicSection({ node, techId }: { node: TopicNode; techId: string }) {
                     </li>
                   ))}
                 </ul>
+              </div>
+            )}
+            </div>
+            {node.theoryDetail.comparisons && node.theoryDetail.comparisons.length > 0 && (
+              <div className="bg-(--bg-surface) border border-(--border) rounded-xl p-5 md:p-6">
+                <h4 className="text-xs font-semibold text-(--text-3) uppercase tracking-wider mb-4">Comparisons</h4>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  {node.theoryDetail.comparisons.map((comparison, i) => (
+                    <div key={i} className="rounded-xl border border-(--border) bg-(--bg-elevated) p-4">
+                      <h5 className="text-sm font-semibold text-(--text-1)">{comparison.title}</h5>
+                      {comparison.summary && (
+                        <p className="mt-2 text-xs leading-relaxed text-(--text-2)">{comparison.summary}</p>
+                      )}
+                      <ul className="mt-3 space-y-2">
+                        {comparison.points.map((point, pointIndex) => (
+                          <li key={pointIndex} className="flex items-start gap-2 text-sm leading-relaxed text-(--text-2)">
+                            <span className="mt-1 shrink-0 text-(--accent-fg)">•</span>
+                            <span>{point}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -303,7 +329,8 @@ function TopicSection({ node, techId }: { node: TopicNode; techId: string }) {
                 )}
               </div>
               <CodeBlock code={example.code} language={example.language} />
-              {example.output && (
+              <CssPreview example={example} />
+              {example.language !== "css" && !example.preview && example.output && (
                 <div className="border-t border-(--border)">
                   <div className="flex items-center gap-2 px-6 py-2.5 bg-(--bg-elevated) border-b border-(--border)">
                     <span className="w-2 h-2 rounded-full bg-(--success) shrink-0" />
