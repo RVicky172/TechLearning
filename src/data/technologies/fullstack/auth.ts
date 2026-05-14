@@ -5,7 +5,7 @@ export const fullstackAuth: TopicNode = {
   title: "Authentication & Authorization",
   iconName: "ShieldCheck",
   theory:
-    "Authentication verifies who a user is (identity); authorization determines what they are allowed to do (permissions). Getting these right is critical — mistakes lead to data breaches and privilege escalation.",
+    "Authentication verifies who a user is (identity); authorization determines what they are allowed to do (permissions). Getting these right is critical — mistakes lead to data breaches, account takeover, and privilege escalation.",
   theoryDetail: {
     keyConcepts: [
       "Authentication: proving identity — login with password, OAuth, passkeys, biometrics",
@@ -131,6 +131,98 @@ try {
 app.delete('/api/posts/:id', authenticate, requireRole('admin', 'editor'), deletePost);
 app.get('/api/admin/users', authenticate, requireRole('admin'), listUsers);`,
             language: "javascript",
+          },
+        ],
+      },
+    },
+    {
+      id: "fullstack-auth-methods",
+      title: "Real-World Authentication Methods",
+      iconName: "Fingerprint",
+      link: "https://auth0.com/docs/authenticate",
+      theory:
+        "Production systems rarely rely on a single login method. Real applications mix passwords, magic links, one-time codes, social login, enterprise SSO, MFA, passkeys, and device trust depending on the audience and security level required.",
+      theoryDetail: {
+        keyConcepts: [
+          "Password-based login is still common, but it should be combined with strong hashing, login throttling, and optional MFA.",
+          "Magic links and OTPs reduce password handling but shift risk to email and SMS channels.",
+          "OAuth and OIDC support social login and enterprise identity providers without storing the user's primary password yourself.",
+          "Passkeys based on WebAuthn are increasingly important because they resist phishing better than passwords and SMS codes.",
+          "MFA combines factors such as something you know, have, or are to reduce account takeover risk.",
+        ],
+        whyItMatters:
+          "Choosing the wrong auth method creates friction for users or weak security for the business. Modern engineers need to understand when to use sessions, JWTs, passkeys, SSO, MFA, service accounts, and API keys in the real world.",
+        commonPitfalls: [
+          "Using SMS as the only second factor for high-risk systems even though it is vulnerable to SIM-swap attacks.",
+          "Treating API keys like user authentication instead of machine credentials with scope and rotation.",
+          "Building custom auth flows when a proven provider or library would reduce security risk.",
+        ],
+        comparisons: [
+          {
+            title: "When each auth method fits",
+            summary: "Pick the method based on user type, risk, and operational complexity.",
+            points: [
+              "Passwords: easy to understand, weakest user experience and phishing resistance",
+              "Magic links or OTP: simpler onboarding, depends on email or phone security",
+              "OAuth or OIDC: ideal for social login and enterprise SSO",
+              "Passkeys: strongest phishing resistance and improving user experience",
+              "API keys and service tokens: for machine-to-machine access, not end-user login",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      id: "fullstack-auth-attacks",
+      title: "Authentication Attacks and Defenses",
+      iconName: "AlertTriangle",
+      link: "https://owasp.org/www-community/attacks/",
+      theory:
+        "Authentication systems are a primary attack surface. You need to understand the common attacks used in real systems so you can design mitigations before the first incident rather than after it.",
+      theoryDetail: {
+        keyConcepts: [
+          "Brute-force and credential-stuffing attacks try many passwords or leaked username-password pairs against login endpoints.",
+          "Phishing steals credentials or MFA codes by tricking users into logging into a fake site.",
+          "Session hijacking steals a valid session or token through XSS, malware, network compromise, or poor cookie handling.",
+          "CSRF tricks a logged-in browser into sending unwanted authenticated requests when cookie-based auth is not protected correctly.",
+          "JWT and OAuth implementation flaws often come from weak token validation, bad redirect handling, or token storage mistakes.",
+        ],
+        whyItMatters:
+          "Attack explanations make the defensive controls easier to understand. Rate limits, MFA, HttpOnly cookies, CSRF tokens, PKCE, device binding, anomaly detection, and passkeys all make more sense when you know the attack they are stopping.",
+        commonPitfalls: [
+          "Thinking HTTPS alone prevents phishing, credential stuffing, or token theft.",
+          "Using localStorage for long-lived tokens, which exposes them to XSS.",
+          "Ignoring account recovery and password reset flows, which attackers often target because they are weaker than the main login flow.",
+        ],
+        comparisons: [
+          {
+            title: "Common auth attacks",
+            summary: "Each attack targets a different weak point in the identity flow.",
+            points: [
+              "Brute force: guesses many passwords for one account",
+              "Credential stuffing: reuses leaked credentials across many sites",
+              "Phishing: tricks users into handing over valid credentials or MFA codes",
+              "Session hijacking: steals a session cookie or token after login",
+              "CSRF: abuses the browser's automatic cookie sending to trigger actions",
+              "Privilege escalation: bypasses authz checks to access higher-privilege resources",
+            ],
+          },
+        ],
+        examples: [
+          {
+            title: "Defense checklist for login flows",
+            description: "A practical set of controls for real-world auth endpoints.",
+            code: `Recommended defenses:
+- hash passwords with argon2id or bcrypt
+- apply rate limits and bot detection on login and reset endpoints
+- use MFA for sensitive accounts
+- store session tokens in Secure, HttpOnly cookies
+- use CSRF protection for cookie-based flows
+- validate OAuth state, nonce, redirect URIs, and PKCE
+- rotate refresh tokens and detect reuse
+- log suspicious sign-in activity and impossible travel
+- harden account recovery and email change flows`,
+            language: "text",
           },
         ],
       },

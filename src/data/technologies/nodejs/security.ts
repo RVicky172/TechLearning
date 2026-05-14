@@ -19,6 +19,25 @@ export const nodeSecurity: TopicNode = {
       "Not expiring tokens — short-lived access tokens (15m) with refresh tokens are safer than long-lived ones",
       "Missing authorization checks — always verify the authenticated user owns the resource they're accessing",
     ],
+    examples: [
+      {
+        title: "Authorization guard beyond authentication",
+        description:
+          "Authenticate first, then enforce resource ownership or role-based access.",
+        code: `router.patch('/users/:id', requireAuth, async (req, res) => {
+  const isOwner = req.user.sub === req.params.id;
+  const isAdmin = req.user.roles?.includes('admin');
+
+  if (!isOwner && !isAdmin) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+
+  const updated = await userService.update(req.params.id, req.body);
+  res.json(updated);
+});`,
+        language: "javascript",
+      },
+    ],
   },
   children: [
     {

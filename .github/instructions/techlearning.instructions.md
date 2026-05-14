@@ -6,7 +6,7 @@ description: "Use when adding technologies, topics, components, pages, or UI fea
 
 ## Project Overview
 
-A personalized learning website built with Next.js 15 App Router, TypeScript, Tailwind CSS, Framer Motion, and Lucide React. The UI follows a VS Code documentation-style layout: sticky top bar, fixed left sidebar, content fills the remaining canvas.
+A personalized learning website built with Next.js 16 App Router, TypeScript, Tailwind CSS, Framer Motion, and Lucide React. The UI follows a VS Code documentation-style layout: sticky top bar, fixed left sidebar, and content-driven technology pages rendered from shared curriculum data.
 
 ---
 
@@ -17,7 +17,9 @@ A personalized learning website built with Next.js 15 App Router, TypeScript, Ta
 | Pages / Routes | `src/app/` (App Router) |
 | Dynamic tech routes | `src/app/tech/[id]/page.tsx` |
 | Reusable UI components | `src/components/PascalCase.tsx` |
-| Data & types | `src/data/technologies.ts` |
+| Shared types | `src/data/types.ts` |
+| Technology registry | `src/data/technologies/index.ts` |
+| Technology topic data | `src/data/technologies/<tech>/` |
 | Component CSS modules | `src/components/ComponentName.module.css` |
 | Page CSS modules | `src/app/path/page.module.css` |
 
@@ -67,14 +69,34 @@ All styling follows this priority order:
 
 ## Data Structure
 
-All learning data lives in `src/data/technologies.ts`. **Never scatter data in component files.**
+All shared curriculum types live in `src/data/types.ts`. The top-level technology registry lives in `src/data/technologies/index.ts`, and each technology owns its topic data in `src/data/technologies/<tech>/`. **Never scatter learning data in component files.**
 
 ```typescript
 // Extend or modify these types — never duplicate them elsewhere
+export type TheoryDetail = {
+  keyConcepts?: string[];
+  whyItMatters?: string;
+  commonPitfalls?: string[];
+  comparisons?: Array<{
+    title: string;
+    summary?: string;
+    points: string[];
+  }>;
+  examples?: Array<{
+    title: string;
+    description: string;
+    code: string;
+    language?: string;
+  }>;
+};
+
 export type TopicNode = {
   id: string;          // unique slug
   title: string;
+  iconName?: string;
+  demoComponentKey?: string;
   theory?: string;     // inline explanation text shown beneath the title
+  theoryDetail?: TheoryDetail;
   link?: string;       // external study resource URL
   completed?: boolean; // per-topic completion flag
   children?: TopicNode[]; // recursive sub-topics
@@ -86,13 +108,16 @@ export type Technology = {
   description: string; // one-liner shown on the landing card
   color: string;       // Tailwind bg class for theming (e.g. "bg-blue-500")
   iconName: string;    // exact Lucide React icon name (e.g. "FileCode2")
+  deviconClass: string;
   tree: TopicNode[];   // top-level topic nodes
 };
 ```
 
+Current top-level technologies in the catalog are `react`, `javascript`, `typescript`, `nodejs`, `databases`, `cloud`, `css`, `scss`, `fullstack`, `ai`, `dsa`, and `webpack`.
+
 ### Adding a New Technology
 
-Append to the `technologies` array. All fields are required except `theory`, `link`, `completed`, and `children` on `TopicNode`.
+Create a dedicated folder in `src/data/technologies/<tech>/`, add a thin `index.ts` assembler, and then append the exported `Technology` object to the `technologies` array in `src/data/technologies/index.ts`. All `Technology` fields are required. On `TopicNode`, `theory`, `theoryDetail`, `link`, `completed`, and `children` are optional.
 
 ```typescript
 {
@@ -101,6 +126,7 @@ Append to the `technologies` array. All fields are required except `theory`, `li
   description: "Readable, general-purpose language for scripting, data, and AI.",
   color: "bg-yellow-500",
   iconName: "Braces",      // verify name exists in lucide-react
+  deviconClass: "devicon-python-plain colored",
   tree: [ ... ]
 }
 ```
@@ -136,7 +162,7 @@ src/data/technologies/<tech>/
   ```
 - **Naming convention**: export name = `<techPrefix><SectionName>` (e.g. `tsFundamentals`, `tsAdvanced`, `reactHooks`)
 - **Filename**: camelCase matching the section name (e.g. `enumsAndLiterals.ts`, `inPractice.ts`, `modulesAndConfig.ts`)
-- `theoryDetail` must include `keyConcepts`, `whyItMatters`, `commonPitfalls`, and at least one `examples[]` entry with `title`, `description`, `code`, and `language`
+- Prefer `theoryDetail` with `keyConcepts`, `whyItMatters`, and `commonPitfalls`; add `comparisons` and `examples` when they materially improve learning value
 - Examples must be production-quality, realistic snippets — not toy `hello world` code
 
 ### `index.ts` assembler rules
@@ -203,6 +229,13 @@ The top-level `sectionName.ts` file is kept as a thin re-export so the main `ind
 - To add a new top-level section: create a new section file, export the `TopicNode`, then import and append it to `tree` in `index.ts`
 - To add a child topic: find the section file by matching the node ID prefix and edit `children[]` there
 - **Never** copy topic data into `index.ts` — it defeats the purpose of the split
+
+### Topic quality guidance
+
+- Favor modern, real-world content over generic definitions. Cover what engineers actually use in production today.
+- When relevant, include tradeoffs, security concerns, deployment context, and operational pitfalls.
+- Prefer topics that connect frontend learning with backend, data, infrastructure, and cloud realities.
+- Keep explanations scannable, but make examples concrete enough that a learner could build from them.
 
 ---
 

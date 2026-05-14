@@ -19,6 +19,24 @@ export const nodeDatabases: TopicNode = {
       "Running N+1 queries — fetching a list then querying each item individually",
       "Not handling database errors distinctly — a unique constraint violation needs a 409, not a 500",
     ],
+    examples: [
+      {
+        title: "Repository-layer error mapping",
+        description:
+          "Translate low-level database errors into stable API-level error responses.",
+        code: `export async function createUser(input) {
+  try {
+    return await db.user.create({ data: input });
+  } catch (error) {
+    if (isUniqueViolation(error, 'users_email_key')) {
+      throw new AppError('Email already exists', 409);
+    }
+    throw new AppError('Database write failed', 500);
+  }
+}`,
+        language: "javascript",
+      },
+    ],
   },
   children: [
     {

@@ -19,6 +19,21 @@ export const nodePerformance: TopicNode = {
       "Using console.log in production — it's synchronous and blocks the event loop under high throughput",
       "Killing the server with SIGKILL instead of SIGTERM, dropping all in-flight requests",
     ],
+    examples: [
+      {
+        title: "Production readiness checklist",
+        description:
+          "A short baseline before shipping a Node API to production.",
+        code: `1) Run multiple replicas or cluster workers
+2) Add health/readiness endpoints (/livez, /healthz)
+3) Enable structured JSON logs with request IDs
+4) Configure graceful shutdown on SIGTERM
+5) Set DB pool limits and request timeouts
+6) Monitor p95 latency, 5xx rate, CPU, memory
+7) Load test critical endpoints before release`,
+        language: "text",
+      },
+    ],
   },
   children: [
     {

@@ -19,6 +19,20 @@ export const fullstackApis: TopicNode = {
       "Not handling API errors distinctly — network failures, 4xx, and 5xx need different UX responses",
       "Ignoring rate limits and not implementing exponential back-off on retries",
     ],
+    examples: [
+      {
+        title: "Frontend API error handling matrix",
+        description:
+          "Treat API failures by category so user experience stays predictable.",
+        code: `401/403 (auth): redirect to login or show permission error
+404 (missing data): show empty state with recovery action
+409 (conflict): prompt user to refresh/retry with latest version
+422 (validation): highlight invalid fields inline
+429 (rate limit): back off and retry with jitter
+5xx (server): show fallback UI and retry option`,
+        language: "text",
+      },
+    ],
   },
   children: [
     {

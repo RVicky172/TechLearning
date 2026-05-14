@@ -19,6 +19,27 @@ export const nodeTesting: TopicNode = {
       "Sharing state between tests — each test must set up and tear down its own fixtures",
       "Skipping error path tests — unhappy paths (404, 401, 500) need as much coverage as happy paths",
     ],
+    examples: [
+      {
+        title: "Test command split by layer",
+        description:
+          "Separate test suites by speed and confidence so CI feedback is faster.",
+        code: `{
+  "scripts": {
+    "test": "jest",
+    "test:unit": "jest --selectProjects unit",
+    "test:integration": "jest --selectProjects integration",
+    "test:ci": "npm run test:unit && npm run test:integration -- --runInBand"
+  }
+}
+
+// CI strategy
+// - run unit tests on every push
+// - run integration tests on pull requests
+// - run smoke E2E after deploy`,
+        language: "json",
+      },
+    ],
   },
   children: [
     {

@@ -19,6 +19,25 @@ export const nodeAsync: TopicNode = {
       "Creating Promises without attaching .catch() or try/catch causing silent failures",
       "Over-parallelizing connections exhausting OS file descriptors or database connection pools",
     ],
+    examples: [
+      {
+        title: "Bounded concurrency pattern",
+        description:
+          "Limit parallel async work to protect database pools and external APIs.",
+        code: `import pLimit from 'p-limit';
+
+const limit = pLimit(10); // max 10 concurrent tasks
+const jobs = ids.map((id) =>
+  limit(async () => {
+    const user = await getUser(id);
+    return enrichUser(user);
+  })
+);
+
+const results = await Promise.all(jobs);`,
+        language: "javascript",
+      },
+    ],
   },
   children: [
     {
@@ -78,6 +97,29 @@ const [user, orders] = await Promise.all([
           "Blocking the poll phase with synchronous operations preventing other callbacks from running",
           "Recursive process.nextTick() calls starving I/O callbacks entirely",
           "Assuming setTimeout(fn, 0) fires immediately — it fires in the timers phase after I/O",
+        ],
+        examples: [
+          {
+            title: "Execution order probe",
+            description:
+              "A quick script to reason about nextTick, promises, timers, and immediates.",
+            code: `console.log('start');
+
+setTimeout(() => console.log('timeout'), 0);
+setImmediate(() => console.log('immediate'));
+Promise.resolve().then(() => console.log('promise microtask'));
+process.nextTick(() => console.log('nextTick'));
+
+console.log('end');
+
+// Typical order:
+// start
+// end
+// nextTick
+// promise microtask
+// timeout / immediate (context-dependent)`,
+            language: "javascript",
+          },
         ],
       },
     },

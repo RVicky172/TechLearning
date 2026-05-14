@@ -19,6 +19,27 @@ export const nodeFundamentals: TopicNode = {
       "Treating Node's environment as identical to the browser — APIs and globals differ",
       "Not handling errors on EventEmitter instances causing silent crashes",
     ],
+    examples: [
+      {
+        title: "Event loop friendly request handler",
+        description:
+          "Move blocking work out of the request path and keep handlers async.",
+        code: `import { readFile } from 'node:fs/promises';
+
+// Avoid readFileSync in request handlers.
+export async function getConfig(req, res) {
+  try {
+    const raw = await readFile('./config/runtime.json', 'utf8');
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(raw);
+  } catch (error) {
+    res.writeHead(500);
+    res.end('config unavailable');
+  }
+}`,
+        language: "javascript",
+      },
+    ],
   },
   children: [
     {
@@ -40,6 +61,25 @@ export const nodeFundamentals: TopicNode = {
           "Mixing require() and import/export in the same project without a clear strategy",
           "Circular requires returning partially-initialized module objects",
           "Forgetting 'type': 'module' in package.json when using ESM import syntax",
+        ],
+        examples: [
+          {
+            title: "ESM package configuration",
+            description:
+              "Use explicit ESM settings to avoid import/require ambiguity.",
+            code: `{
+  "name": "api-service",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js"
+  }
+}`,
+            language: "json",
+          },
         ],
       },
     },
@@ -63,6 +103,21 @@ export const nodeFundamentals: TopicNode = {
           "Not listening for 'error' events on streams causing unhandled exceptions",
           "Opening file handles without closing them — use the async iterator or stream.pipeline()",
         ],
+        examples: [
+          {
+            title: "Stream large file safely",
+            description:
+              "Pipe a large file response without loading the entire payload into memory.",
+            code: `import { createReadStream } from 'node:fs';
+import { pipeline } from 'node:stream/promises';
+
+export async function download(req, res) {
+  res.writeHead(200, { 'Content-Type': 'application/octet-stream' });
+  await pipeline(createReadStream('./archives/report.zip'), res);
+}`,
+            language: "javascript",
+          },
+        ],
       },
     },
     {
@@ -84,6 +139,28 @@ export const nodeFundamentals: TopicNode = {
           "Forgetting res.end() leaving client connections hanging indefinitely",
           "Not consuming the request body before responding — it's a stream, not a string",
           "Omitting error handling leaving the server vulnerable to crashes on malformed requests",
+        ],
+        examples: [
+          {
+            title: "Minimal robust http server",
+            description:
+              "A baseline pattern that sets status, headers, and always completes responses.",
+            code: `import http from 'node:http';
+
+const server = http.createServer((req, res) => {
+  if (req.url === '/healthz') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end('{"ok":true}');
+    return;
+  }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain' });
+  res.end('Not found');
+});
+
+server.listen(3000);`,
+            language: "javascript",
+          },
         ],
       },
     },

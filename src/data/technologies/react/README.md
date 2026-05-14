@@ -35,32 +35,54 @@ react/
 │   ├── useRef.ts
 │   ├── useMemoCallback.ts
 │   ├── useContext.ts
-│   ├── useEffect.ts
+│   ├── custom.ts
+│   ├── customHooksReal.ts
+│   └── modern.ts
 │   ├── effectAlternatives.ts
 │   ├── useLayoutEffect.ts
 │   ├── useTransition.ts
+│   ├── accessibility.ts
+│   ├── architecture.ts
+│   ├── batching.ts
 │   └── custom.ts
+│   ├── optimisticUpdates.ts
 │
 ├── advanced/
 │   ├── index.ts
+│   ├── reactCompiler.ts
+│   ├── securityReact.ts
+│   ├── serverComponents.ts
+│   ├── suspenseStreaming.ts
+│   ├── throttlingDebouncing.ts
+│   ├── typescriptReact.ts
+│   ├── urlState.ts
 │   ├── context.ts
 │   ├── stateStrategy.ts
 │   ├── effects.ts
 │   ├── performance.ts
 │   ├── virtualization.ts
+│   ├── componentDesign.ts
+│   ├── compoundComponents.ts
 │   └── patterns.ts
+│   ├── testing.ts
 │
 ├── patterns/
 │   ├── index.ts
 │   ├── errorBoundaries.ts
-│   ├── testing.ts
+│   └── renderProps.ts
 │   ├── forwardRef.ts
 │   ├── hoc.ts
 │   ├── lazyLoading.ts
+    ├── deploymentProduction.ts
+    ├── formPatterns.ts
+    ├── reactTestingLibrary.ts
+    ├── reduxToolkit.ts
 │   ├── portals.ts
 │   └── renderProps.ts
 │
-└── ecosystem/
+    ├── query.ts
+    ├── stateManagement.ts
+    └── stylingStrategies.ts
     ├── index.ts
     ├── reactRouter.ts
     ├── routing.ts
@@ -116,32 +138,53 @@ Top-level order in `react/index.ts`:
 - useLayoutEffect
 - useTransition & useDeferredValue
 - Custom Hooks
+- Custom Hooks in Real Applications
+- Modern Hooks and newer React patterns
 
 ### Advanced Concepts
 
 - Context API
+- Accessibility in React
+- Architecture for larger React apps
+- Automatic batching
+- Optimistic UI updates
 - State Management Strategy
 - useEffect & Side Effects
 - Performance Optimization
+- React Compiler
+- React security concerns
+- Server Components
+- Suspense & Streaming
+- Throttling and Debouncing
+- TypeScript with React
+- URL state patterns
 - List Virtualization
 - Component Patterns
 
 ### Patterns & Techniques
 
+- Component Design
+- Compound Components
 - Error Boundaries
+- Testing patterns
 - forwardRef
 - Higher-Order Components
 - Lazy Loading & Suspense
-- Testing React Behavior
 - Portals
 - Render Props
 
 ### React Ecosystem
 
+- Deployment & Production
+- Form Patterns
+- React Testing Library
 - React Router
+- Redux Toolkit
 - Routing with Next.js
 - Server vs Client Components
 - Data Fetching & Caching
+- State Management Libraries and patterns
+- Styling Strategies
 
 ### Interview Questions
 
@@ -155,6 +198,7 @@ Top-level order in `react/index.ts`:
 - Each topic file exports one named `TopicNode`.
 - Each section `index.ts` assembles a parent `TopicNode` with a `children` array.
 - `react/index.ts` assembles the final `Technology` object consumed by the app.
+- Shared topic and technology types live in `src/data/types.ts`.
 
 ## Adding a New Topic
 
@@ -171,3 +215,8 @@ Types are defined in `src/data/types.ts`.
 - `Technology`: top-level object for a technology.
 - `TopicNode`: a node in the learning tree.
 - `TheoryDetail`: key concepts, why it matters, pitfalls, and examples.
+
+## Maintenance Notes
+
+- Keep this README aligned with the actual folder structure when new React topics are added.
+- Prefer current React guidance, including Server Components, modern hooks, React Compiler considerations, and production deployment topics where relevant.

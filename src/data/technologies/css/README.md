@@ -2,6 +2,10 @@
 
 This folder contains the learning content for the CSS technology. The content is split by topic so layout, visual styling, responsiveness, animation, and interview prep can evolve independently.
 
+## Catalog Context
+
+CSS is one technology inside the shared catalog assembled in `src/data/technologies/index.ts`. Shared curriculum types live in `src/data/types.ts`, while this folder owns only CSS-specific topic data.
+
 ## Current Structure
 
 ```text
@@ -115,7 +119,7 @@ Current focus:
 
 ## How It Works
 
-- Each file exports one or more named `TopicNode` values.
+- Topic files generally export one named `TopicNode`; section `index.ts` files assemble them into parent nodes.
 - `css/index.ts` assembles the final `Technology` object used by the app.
 - Section folders can use an `index.ts` parent file that imports child topic files and assembles the section node.
 - Rich topic content lives in `theoryDetail`, including concepts, pitfalls, comparisons, examples, and output previews.
@@ -131,3 +135,4 @@ When adding or updating CSS content:
 4. For larger sections, prefer a folder with one topic per file and an `index.ts` that assembles the parent node.
 5. Update this README when sections or tracking notes change.
 6. Cover browser quirks explicitly when they are common interview traps, especially sizing bugs involving units, scrollbars, and mobile viewport behavior.
+7. Keep examples aligned with the current app conventions in `src/data/types.ts`, including `theoryDetail.examples[].preview` when a live demo is useful.

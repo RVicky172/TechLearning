@@ -19,6 +19,31 @@ export const nodeExpress: TopicNode = {
       "Not having a global error handler — unhandled errors become 500 responses with stack traces in production",
       "Mounting middleware after routes — middleware must be registered before the routes it should affect",
     ],
+    examples: [
+      {
+        title: "Production route module structure",
+        description:
+          "A maintainable Express layout that separates routing, controllers, and middleware.",
+        code: `src/
+  app.js
+  routes/
+    users.routes.js
+    orders.routes.js
+  controllers/
+    users.controller.js
+    orders.controller.js
+  middleware/
+    auth.js
+    validate.js
+    error-handler.js
+
+// app.js
+app.use('/users', usersRouter);
+app.use('/orders', ordersRouter);
+app.use(errorHandler);`,
+        language: "javascript",
+      },
+    ],
   },
   children: [
     {

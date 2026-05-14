@@ -5,18 +5,20 @@ export const fullstackNetworking: TopicNode = {
   title: "Networking Basics",
   iconName: "Network",
   theory:
-    "Every web application communicates over a network. Understanding how devices are addressed, how domain names resolve, and how HTTP transfers data is foundational knowledge every web developer needs.",
+    "Every web application communicates over a network. Understanding how devices are addressed, how domain names resolve, how proxies route traffic, and how HTTP transfers data is foundational knowledge every web developer needs.",
   theoryDetail: {
     keyConcepts: [
       "IP addresses uniquely identify every device on a network",
       "DNS translates human-readable domain names into machine-readable IP addresses",
+      "Proxies and reverse proxies sit between clients and servers to route, protect, cache, or inspect traffic",
       "HTTP defines how clients and servers exchange messages on the web",
     ],
     whyItMatters:
-      "Debugging network issues, understanding latency, and configuring deployments all require solid networking fundamentals. Without them, common problems like DNS propagation delays or CORS errors become black boxes.",
+      "Debugging network issues, understanding latency, and configuring deployments all require solid networking fundamentals. Without them, common problems like DNS propagation delays, reverse proxy misconfiguration, or CORS errors become black boxes.",
     commonPitfalls: [
       "Confusing IPv4 and IPv6 address formats when configuring firewall rules or server bindings",
       "Ignoring DNS TTLs during deployments — changes may not propagate instantly to all clients",
+      "Not understanding whether a bug is happening at the app server, load balancer, CDN, or reverse proxy layer",
       "Not understanding the difference between HTTP/1.1, HTTP/2, and HTTP/3 and their performance implications",
     ],
   },
@@ -149,6 +151,61 @@ Location: /api/users/42
 
 {"id": 42, "name": "Alice", "email": "alice@example.com"}`,
             language: "bash",
+          },
+        ],
+      },
+    },
+    {
+      id: "fullstack-proxies",
+      title: "Proxies and Their Types",
+      iconName: "Waypoints",
+      link: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling",
+      theory:
+        "A proxy is an intermediary that forwards network traffic between two parties. In real systems, proxies are used for security, caching, load balancing, observability, TLS termination, and hiding internal services from direct public access.",
+      theoryDetail: {
+        keyConcepts: [
+          "Forward proxy sits in front of clients and is commonly used in corporate networks for filtering, logging, or outbound access control.",
+          "Reverse proxy sits in front of servers and is common in production systems for TLS termination, routing, load balancing, caching, and rate limiting.",
+          "Transparent proxies intercept traffic without explicit client configuration, while explicit proxies require the client to send traffic through them intentionally.",
+          "CDNs and API gateways are specialized proxy layers with additional caching, security, and policy features.",
+        ],
+        whyItMatters:
+          "Most real deployments include at least one proxy layer such as Nginx, Cloudflare, AWS ALB, Vercel edge, or an API gateway. Understanding proxies is necessary for debugging headers, IP forwarding, HTTPS termination, cookies, WebSocket behavior, and deployment routing.",
+        commonPitfalls: [
+          "Trusting the X-Forwarded-For header from untrusted sources instead of only from known proxy layers.",
+          "Forgetting to configure proxy-aware secure cookies or HTTPS redirects when TLS terminates before the app server.",
+          "Breaking uploads or WebSockets because the reverse proxy timeout, buffer, or upgrade settings are wrong.",
+        ],
+        comparisons: [
+          {
+            title: "Common proxy types",
+            summary: "The main difference is which side the proxy represents and what problem it solves.",
+            points: [
+              "Forward proxy: represents the client for outbound traffic",
+              "Reverse proxy: represents backend servers for inbound traffic",
+              "Load balancer: distributes traffic across many healthy instances",
+              "CDN: caches static or edge-computable content close to users",
+              "API gateway: centralizes auth, rate limits, routing, and policy enforcement for APIs",
+            ],
+          },
+        ],
+        examples: [
+          {
+            title: "Typical reverse proxy flow",
+            description: "A common path for a production web request.",
+            code: `Browser
+  -> CDN / WAF
+  -> Load balancer or reverse proxy
+  -> application service
+  -> database
+
+Reverse proxy jobs:
+- terminate TLS
+- add X-Forwarded-* headers
+- route /api and /assets differently
+- enforce request size and timeout limits
+- retry or fail over upstreams`,
+            language: "text",
           },
         ],
       },

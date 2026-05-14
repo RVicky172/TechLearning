@@ -19,6 +19,20 @@ export const nodeInterviewQuestions: TopicNode = {
       "Not distinguishing CPU-bound and I/O-bound workloads",
       "Forgetting graceful shutdown and error handling in API examples",
     ],
+    examples: [
+      {
+        title: "Interview answer framing template",
+        description:
+          "A reliable structure to answer senior Node.js system questions clearly.",
+        code: `1) State assumptions and constraints
+2) Explain baseline architecture
+3) Identify bottlenecks (CPU, I/O, DB, network)
+4) Propose scaling and reliability controls
+5) Add security and observability decisions
+6) Mention trade-offs and fallback plan`,
+        language: "text",
+      },
+    ],
   },
   children: [
     {
