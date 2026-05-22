@@ -170,6 +170,57 @@ app.get('/api/admin/users', authenticate, requireRole('admin'), listUsers);`,
             ],
           },
         ],
+        examples: [
+          {
+            title: "How Magic Links Work",
+            description: "A passwordless flow where the user receives a unique, short-lived token via email.",
+            code: `// 1. User enters email -> Server generates token
+const token = crypto.randomBytes(32).toString('hex');
+const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+await db.VerificationToken.create({ email, token, expires });
+
+// 2. Server sends email
+await sendEmail(email, \`Click here to login: https://app.com/verify?token=\${token}\`);
+
+// 3. User clicks link -> Server verifies token
+app.get('/verify', async (req, res) => {
+  const record = await db.VerificationToken.find({ token: req.query.token });
+  if (!record || record.expires < new Date()) {
+    return res.status(401).send('Token expired or invalid');
+  }
+  // Log user in, create session, delete token
+  createSession(record.email);
+  await db.VerificationToken.delete({ token });
+});`,
+            language: "javascript",
+          },
+          {
+            title: "OAuth 2.0 / Social Login Flow",
+            description: "How 'Sign in with Google' works at a high level.",
+            code: `// 1. App redirects user to Google
+const googleAuthUrl = \`https://accounts.google.com/o/oauth2/v2/auth?client_id=\${CLIENT_ID}&redirect_uri=\${REDIRECT_URI}&response_type=code&scope=email profile\`;
+res.redirect(googleAuthUrl);
+
+// 2. Google redirects back to your app with a "code"
+// E.g., https://app.com/callback?code=4/P7q7W91a-oMsCeLvIa-1m_k
+
+// 3. Your backend exchanges the code for an Access/ID Token
+const response = await fetch('https://oauth2.googleapis.com/token', {
+  method: 'POST',
+  body: new URLSearchParams({
+    code: req.query.code,
+    client_id: CLIENT_ID,
+    client_secret: CLIENT_SECRET,
+    redirect_uri: REDIRECT_URI,
+    grant_type: 'authorization_code'
+  })
+});
+const { access_token, id_token } = await response.json();
+
+// 4. Decode id_token to get user email/profile, then log them in`,
+            language: "javascript",
+          },
+        ],
       },
     },
     {

@@ -307,113 +307,106 @@ const modulesNode: TopicNode = {
   iconName: "Package",
   link: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules",
   theory:
-    "ES Modules are the official JavaScript module standard. They use static import/export syntax, enabling tree-shaking, circular dependency detection, and top-level await. Every file is its own scope — no global leakage.",
+    "ES Modules (ESM) represent the unified future of JavaScript code organization across browsers and servers. Introduced in ES6, they provide a static, declarative syntax for importing and exporting code, resolving the chaotic history of script tags, global variables, and competing module formats like AMD and CommonJS.",
   theoryDetail: {
     keyConcepts: [
-      "Named exports: export const fn = () => {} — import { fn } from './file'",
-      "Default export: export default class — import Anything from './file' (one per file)",
-      "Re-export (barrel): export { fn } from './module' — aggregate related exports in index.ts",
-      "Dynamic import: const { fn } = await import('./module') — lazy load, code splitting",
-      "Modules are singletons: evaluated once and cached — the same export object is shared",
-      "ESM is always strict mode — no 'with', no undeclared variables",
+      "Static Structure: Imports and exports must be at the top level. They cannot be placed inside if-statements or functions. This allows tools to analyze the dependency graph without running the code.",
+      "Named vs Default Exports: Modules can export multiple named items (export const x = 1) or a single default item (export default class User).",
+      "Module Scope: Variables declared in a module are strictly scoped to that module. They do not pollute the global 'window' or 'global' object.",
+      "Strict Mode: All ESM code automatically runs in 'use strict' mode.",
+      "Live Bindings: Imports are read-only views of the exported values. If the exporting module changes a value, the importing module sees the change.",
     ],
     whyItMatters:
-      "ES Modules are the foundation of every modern bundler (Vite, webpack, esbuild). Named exports enable tree-shaking — unused exports are eliminated from bundles. Barrel files (index.ts) organise and re-export modules for cleaner imports.",
+      "Modern frontend development is built entirely on ES Modules. Bundlers like Vite, Webpack, and Rollup rely on the static nature of ESM to perform 'Tree Shaking'—analyzing your code and stripping away unused exports to minimize bundle sizes. Without ESM, modern performant web apps would be impossible to deliver efficiently.",
     commonPitfalls: [
-      "Circular imports: A imports B which imports A — modules resolve but may get undefined at import time",
-      "Default export + tree-shaking: bundlers can't easily eliminate parts of a default export — prefer named exports for utilities",
-      "import * as ns: imports the entire namespace — prevents tree-shaking for that dependency",
-      "CJS interop: require() and import mix inconsistently — use .mjs/.cjs extensions or package.json 'type: module'",
+      "Mixing Default and Named Imports Incorrectly: e.g. import React, { useState } from 'react' works, but import { React } will fail if React is a default export.",
+      "Circular Dependencies: Module A imports Module B, which imports Module A. While ESM handles this better than CJS via live bindings, it can still lead to variables being 'undefined' during initialization.",
+      "Namespace Imports Breaking Tree-Shaking: Using 'import * as utils from ./utils' forces the bundler to include the entire module, even if you only use one function.",
+    ],
+    comparisons: [
+      {
+        title: "ES Modules (ESM) vs CommonJS (CJS)",
+        summary: "Why the frontend world abandoned CommonJS.",
+        points: [
+          "Syntax: ESM uses import/export. CJS uses require()/module.exports.",
+          "Loading Mechanism: ESM is asynchronous, fetching and parsing before executing. CJS is synchronous, reading and executing as require() is called.",
+          "Static vs Dynamic: ESM's static nature allows bundlers like Vite to tree-shake (remove dead code). CJS's dynamic nature makes tree-shaking practically impossible, leading to bloated bundles.",
+          "Environment: ESM works natively in modern browsers (via <script type=\"module\">) and Node.js. CJS is historically Node-only and requires a bundler to work in browsers.",
+        ]
+      }
     ],
     examples: [
       {
-        title: "Named vs default exports, barrel files, and dynamic imports",
-        description: "Modern module patterns used in every Next.js and Vite project.",
-        code: `// ─── math.ts — Named exports ───
+        title: "Mastering Export and Import Syntax",
+        description: "The complete guide to how exports and imports are structured in real-world frontend applications.",
+        code: `// ─── utils/math.ts (Exporting) ───
+// 1. Named exports (can have multiple)
 export const PI = 3.14159;
-export function add(a: number, b: number) { return a + b; }
-export function multiply(a: number, b: number) { return a * b; }
+export function add(a, b) { return a + b; }
 
-// ─── logger.ts — Default export ───
-export default class Logger {
-  log(msg: string) { console.log(\`[LOG] \${msg}\`); }
+// 2. Default export (only ONE per file)
+export default class Calculator {
+  constructor() { this.value = 0; }
 }
 
-// ─── utils/index.ts — Barrel file (re-exports) ───
-export { add, multiply, PI } from "./math";
-export { default as Logger }  from "./logger";
-export type { User }          from "./types";  // type-only re-export
+// ─── components/App.ts (Importing) ───
+// 1. Importing the default export (you can name it anything!)
+import Calc from '../utils/math.ts';
 
-// ─── main.ts — Importing ───
-import { add, PI }  from "./utils";           // named import
-import Logger       from "./logger";           // default import
-import * as Math    from "./math";             // namespace import (avoid — hurts tree-shaking)
-import { add as sum } from "./math";           // rename on import
+// 2. Importing named exports (must match the exact names)
+import { PI, add } from '../utils/math.ts';
 
-console.log(add(1, 2));   // 3
-console.log(PI);          // 3.14159
-Math.multiply(3, 4);      // 12
+// 3. Renaming named exports to avoid collisions
+import { add as sum } from '../utils/math.ts';
 
-// ─── Dynamic imports (lazy loading) ───
-async function loadChart() {
-  // Module is only downloaded when this function runs
-  const { Chart } = await import("./Chart");
-  return new Chart();
-}
-
-// ─── Type-only imports (TypeScript) ───
-import type { User } from "./types";  // erased at compile time, no runtime cost
-
-// ─── Conditional import pattern ───
-const isBrowser = typeof window !== "undefined";
-const storage = isBrowser
-  ? (await import("./browserStorage")).default
-  : (await import("./serverStorage")).default;
-
-// ─── import.meta (ES module metadata) ───
-console.log(import.meta.url);  // "file:///path/to/module.js"
-// Node.js: use import.meta.url instead of __dirname
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname  = dirname(__filename);`,
+// 4. Namespace import (combines everything into one object)
+// WARNING: This disables tree-shaking for this module!
+import * as MathUtils from '../utils/math.ts';
+console.log(MathUtils.PI);`,
         language: "typescript",
-        output: `NAMED vs DEFAULT EXPORTS
-═══════════════════════════════════════════════════
-  Named:   export const fn = () => {}
-           import { fn } from './file'      ← name must match
-           import { fn as alias } from './file'
-
-  Default: export default fn
-           import ANYTHING from './file'    ← any name works
-           import { default as fn } from './file'
-
-  Per file: unlimited named exports, ONE default
-
-TREE SHAKING IMPACT
-═══════════════════════════════════════════════════
-  // Named exports — bundler can eliminate unused ones
-  export const a = () => {};  // used → included
-  export const b = () => {};  // unused → ELIMINATED ✅
-
-  // Default export object — bundler cannot eliminate parts
-  export default { a: () => {}, b: () => {} };  // entire object included
-
-  Recommendation: prefer named exports for utility files
-
-BARREL FILE PATTERN
-═══════════════════════════════════════════════════
-  // Before (many imports)
-  import { add }     from "../utils/math";
-  import { format }  from "../utils/format";
-  import { debounce } from "../utils/debounce";
-
-  // After (barrel index.ts re-exports all)
-  import { add, format, debounce } from "../utils";
-
-  ⚠️ Large barrel files can slow down bundler analysis.
-     Use path-specific imports in perf-sensitive apps.`,
       },
+      {
+        title: "The Barrel File Pattern (Re-exporting)",
+        description: "A common pattern in React/Next.js projects is to use an 'index.ts' file to aggregate exports from multiple files, making imports much cleaner for consumers.",
+        code: `// ─── components/Button.tsx ───
+export const Button = () => <button>Click me</button>;
+
+// ─── components/Input.tsx ───
+export const Input = () => <input type="text" />;
+
+// ─── components/index.ts (The Barrel File) ───
+export { Button } from './Button';
+export { Input } from './Input';
+
+// ─── App.tsx (The Consumer) ───
+// Before:
+// import { Button } from './components/Button';
+// import { Input } from './components/Input';
+
+// After (Clean and concise):
+import { Button, Input } from './components';`,
+        language: "typescript",
+      },
+      {
+        title: "Code Splitting with Dynamic Imports",
+        description: "Dynamic imports allow you to load code asynchronously only when it's needed. This is the foundation of 'Lazy Loading' in React and modern routing.",
+        code: `// Heavy module that shouldn't be loaded on the initial page load
+const loadDataAnalyzer = async () => {
+  try {
+    // import() returns a Promise containing the module
+    const { analyzeData, generateReport } = await import('./heavy-analyzer.js');
+    
+    const results = analyzeData(myData);
+    generateReport(results);
+  } catch (error) {
+    console.error("Failed to load the analyzer module", error);
+  }
+};
+
+// E.g., trigger only when a user clicks a button
+document.getElementById('analyze-btn').addEventListener('click', loadDataAnalyzer);`,
+        language: "typescript",
+      }
     ],
   },
 };

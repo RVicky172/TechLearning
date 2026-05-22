@@ -1,5 +1,8 @@
 import type { Technology } from "@/data/types";
 import { nodeFundamentals } from "@/data/technologies/nodejs/fundamentals";
+import { nodeEventLoop } from "@/data/technologies/nodejs/eventLoop";
+import { nodeStreams } from "@/data/technologies/nodejs/streams";
+import { nodeCluster } from "@/data/technologies/nodejs/cluster";
 import { nodeAsync } from "@/data/technologies/nodejs/async";
 import { nodeExpress } from "@/data/technologies/nodejs/express";
 import { nodeDatabases } from "@/data/technologies/nodejs/databases";
@@ -17,6 +20,9 @@ const nodejs: Technology = {
   deviconClass: "devicon-nodejs-plain colored",
   tree: [
     nodeFundamentals,
+    nodeEventLoop,
+    nodeStreams,
+    nodeCluster,
     nodeAsync,
     nodeExpress,
     nodeDatabases,

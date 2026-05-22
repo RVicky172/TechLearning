@@ -44,41 +44,92 @@ export async function getConfig(req, res) {
   children: [
     {
       id: "node-modules",
-      title: "Modules & CommonJS",
+      title: "Modules: CommonJS vs ESM",
       iconName: "Package",
-      link: "https://nodejs.org/en/docs/guides/",
+      link: "https://nodejs.org/api/packages.html#modules-packages",
       theory:
-        "Node uses CommonJS modules (require/exports) and ESM (import/export). Understanding module resolution is key to structuring Node projects.",
+        "Node.js historically relied on CommonJS (CJS) with 'require()' and 'module.exports'. Today, the ecosystem is shifting entirely to ES Modules (ESM) with 'import' and 'export'. Understanding the mechanical differences between these two module systems is arguably the most important foundational knowledge for modern Node.js development.",
       theoryDetail: {
         keyConcepts: [
-          "require() is synchronous and uses CommonJS; import/export uses ESM",
-          "package.json 'main' points to the entry file; 'exports' field overrides it",
-          "Node resolves modules by climbing the directory tree looking in node_modules/",
+          "CommonJS is Synchronous: Modules are loaded, parsed, and executed at runtime when require() is called. This can block the event loop if called dynamically.",
+          "ESM is Asynchronous & Phased: Module loading happens in three distinct phases: Construction (finding and parsing), Instantiation (wiring up exports/imports), and Evaluation (running the code).",
+          "Strict Mode by Default: ESM files run in strict mode automatically. 'this' at the top level is undefined.",
+          "Resolution differences: ESM requires file extensions for relative paths (e.g., import './utils.js'). CommonJS automatically resolves .js and /index.js.",
+          "package.json configures the default: Setting 'type': 'module' treats all .js files as ESM. You can force CJS with the .cjs extension, or ESM with the .mjs extension.",
         ],
         whyItMatters:
-          "Understanding modules prevents mysterious 'cannot find module' errors and circular dependency bugs that only appear at runtime.",
+          "The migration from CJS to ESM has split the Node ecosystem. Many popular packages (like 'node-fetch', 'chalk', 'execa') are now 'ESM-only'. If you build a CJS app, you cannot use 'require()' on these packages. Understanding how to structure your app as ESM, and how to interoperate with older CJS code, will save you hours of debugging 'ERR_REQUIRE_ESM' and 'Cannot use import statement outside a module' errors.",
         commonPitfalls: [
-          "Mixing require() and import/export in the same project without a clear strategy",
-          "Circular requires returning partially-initialized module objects",
-          "Forgetting 'type': 'module' in package.json when using ESM import syntax",
+          "ERR_REQUIRE_ESM: Occurs when you try to use require() on an ESM-only package.",
+          "Missing File Extensions: Forgetting to add '.js' to relative imports in ESM code.",
+          "Missing Global Variables: __dirname, __filename, require, and module are not available in ESM. They must be polyfilled or accessed via import.meta.url.",
+        ],
+        comparisons: [
+          {
+            title: "Architectural Differences",
+            summary: "How CJS and ESM differ under the hood.",
+            points: [
+              "Parsing: CJS dependencies are discovered during execution. ESM dependencies are statically analyzed before any code runs.",
+              "Caching: Both cache modules after the first load, but ESM exports bindings (live references), while CJS exports a copied object by default.",
+              "Top-Level Await: ESM allows 'await' at the root of a file (great for database connections). CJS requires wrapping in an async IIFE.",
+            ],
+          },
         ],
         examples: [
           {
-            title: "ESM package configuration",
+            title: "Solving the __dirname and __filename problem in ESM",
             description:
-              "Use explicit ESM settings to avoid import/require ambiguity.",
-            code: `{
-  "name": "api-service",
-  "type": "module",
-  "exports": {
-    ".": "./dist/index.js"
-  },
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "start": "node dist/index.js"
-  }
-}`,
-            language: "json",
+              "Because ESM doesn't inject CommonJS variables like __dirname, you must reconstruct them using the 'url' and 'path' modules. This is a very common requirement when serving static files or resolving local paths.",
+            code: `// In CommonJS: const filepath = path.join(__dirname, 'templates', 'email.html');
+
+// In ES Modules:
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+// import.meta.url is the absolute file:// URL of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const templatePath = join(__dirname, 'templates', 'email.html');
+console.log('Template located at:', templatePath);`,
+            language: "javascript",
+          },
+          {
+            title: "CJS and ESM Interoperability (The Bridge)",
+            description:
+              "Sometimes you are writing an ESM application but need to load a legacy CJS module or a JSON file. You can create a custom require function to bridge the gap.",
+            code: `import { createRequire } from 'node:module';
+
+// Create a require function bound to the current module's URL
+const require = createRequire(import.meta.url);
+
+// 1. Loading JSON (ESM doesn't natively support JSON imports without experimental flags yet)
+const config = require('./config.json');
+
+// 2. Loading legacy CommonJS modules safely
+const legacyLogger = require('old-enterprise-logger');
+
+legacyLogger.info('App started with config v' + config.version);`,
+            language: "javascript",
+          },
+          {
+            title: "Dynamic Imports in CommonJS",
+            description:
+              "If you are stuck in a legacy CommonJS codebase but MUST use an ESM-only package (like node-fetch v3+), you can use the dynamic import() function, which returns a Promise.",
+            code: `// This is a CommonJS file (e.g. index.cjs or 'type': 'commonjs')
+
+async function fetchUserData() {
+  // We cannot use require('node-fetch') because it is an ESM-only package.
+  // Instead, we use dynamic import():
+  const { default: fetch } = await import('node-fetch');
+  
+  const response = await fetch('https://api.github.com/users/octocat');
+  const data = await response.json();
+  console.log(data);
+}
+
+fetchUserData();`,
+            language: "javascript",
           },
         ],
       },

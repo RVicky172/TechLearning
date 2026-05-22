@@ -87,52 +87,90 @@ export const tsModulesAndConfig: TopicNode = {
     },
     {
       id: "ts-modules",
-      title: "ES Modules & Import/Export",
+      title: "Modules: TS, ESM, and CommonJS",
       iconName: "Share2",
-      link: "https://www.typescriptlang.org/docs/handbook/2/modules.html",
+      link: "https://www.typescriptlang.org/docs/handbook/modules/introduction.html",
       theory:
-        "TypeScript fully supports ES module syntax. Understanding how TypeScript resolves imports prevents runtime 'module not found' errors.",
+        "TypeScript uses standard ES Module syntax (import/export), but it must compile that syntax into something the target environment (Node.js or Browser) can actually run. Navigating how TypeScript handles CommonJS and ESM interoperability is critical to avoiding runtime 'module not found' errors.",
       theoryDetail: {
         keyConcepts: [
-          "import type { T } only imports the type — it is erased at compile time and safe for isolatedModules",
-          "Re-export patterns: export { foo } from './foo' without importing into the module scope",
-          "moduleResolution: 'bundler' lets you omit file extensions; 'node16' requires .js extensions in .ts source",
+          "'module' in tsconfig: Determines the OUTPUT syntax. Setting it to 'CommonJS' changes your 'import' statements into 'require()'. Setting it to 'ESNext' or 'NodeNext' keeps them as 'import' statements.",
+          "'moduleResolution' in tsconfig: Determines how TypeScript FINDS the imported files. 'Bundler' is for modern frontend apps using Vite/Webpack. 'NodeNext' is for modern Node.js apps. 'Node' (or 'Node10') is the legacy setting for old CommonJS Node apps.",
+          "esModuleInterop: A crucial tsconfig flag that allows you to default-import CommonJS modules as if they were ES modules (e.g., 'import React from \"react\"' instead of 'import * as React from \"react\"').",
+          "File Extensions in ESM: If you are building a pure ESM Node.js app (using 'moduleResolution: \"NodeNext\"'), TypeScript strictly requires you to include the '.js' extension in your relative imports inside your '.ts' files. (Yes, '.js', not '.ts'!).",
+          "Type-only imports: 'import type { User }' ensures the import is completely erased during compilation. This prevents emitting require() or import statements for interfaces/types.",
         ],
         whyItMatters:
-          "Module resolution bugs are notoriously hard to debug at runtime. Understanding the resolution algorithm early prevents hours of 'Cannot find module' troubleshooting.",
+          "The number one source of confusion in modern TypeScript is the intersection of its module settings with the Node.js ecosystem's transition from CommonJS to ESM. Misconfiguring 'module' and 'moduleResolution' leads to code that passes type-checking perfectly but crashes the moment you run the compiled JavaScript.",
         commonPitfalls: [
-          "Mixing CommonJS require() and ES import in the same file under 'module: ESNext'",
-          "Forgetting 'export {}' in files with no exports when 'isolatedModules' is true",
-          "Not using 'import type' for type-only imports — fails under isolatedModules and Babel transforms",
+          "Importing without extensions in NodeNext: 'import { foo } from \"./utils\"' will fail at runtime in pure ESM Node apps. You MUST write 'import { foo } from \"./utils.js\"'.",
+          "Mixing module types: Emitting CommonJS output for a project that specifies 'type': 'module' in package.json.",
+          "Using 'moduleResolution: \"Node\"' in a frontend project: This legacy option fails to resolve the 'exports' field in modern package.json files. Always use 'Bundler' for frontend.",
+        ],
+        comparisons: [
+          {
+            title: "TS Module Resolution Strategies",
+            summary: "Which 'moduleResolution' you should choose.",
+            points: [
+              "'Bundler': Use this if Vite, Webpack, esbuild, or Next.js is compiling your TS. It allows importing without extensions.",
+              "'NodeNext': Use this if you are building a Node.js backend using ESM. It forces strict Node.js resolution rules, including mandatory file extensions.",
+              "'Node10' (Legacy Node): Avoid unless maintaining an old CommonJS Node.js project.",
+            ],
+          },
         ],
         examples: [
           {
-            title: "Module patterns: type imports, re-exports, barrel files",
+            title: "TypeScript ESM vs CommonJS Output",
             description:
-              "Best practices for structuring imports that work with bundlers and isolatedModules.",
-            code: `// ─── Type-only import: erased at runtime, safe for isolatedModules ───
-import type { User } from "./types";
+              "How the 'module' setting in tsconfig.json drastically changes what TypeScript compiles.",
+            code: `// --- Source TypeScript (index.ts) ---
+import { add } from './math';
+export const result = add(1, 2);
 
-// ─── Value import: kept at runtime ───
-import { createUser } from "./user-service";
+// --- Output if "module": "CommonJS" ---
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.result = void 0;
+const math_1 = require("./math");
+exports.result = (0, math_1.add)(1, 2);
 
-// ─── Re-export without importing into scope ───
-export { createUser } from "./user-service";
-export type { User }  from "./types";
+// --- Output if "module": "ESNext" ---
+import { add } from './math';
+export const result = add(1, 2);`,
+            language: "typescript",
+          },
+          {
+            title: "Strict NodeNext ESM Imports",
+            description:
+              "When configuring TypeScript for modern Node.js ('moduleResolution': 'NodeNext'), you must write your imports with '.js' extensions, even though the source file is '.ts'.",
+            code: `// tsconfig.json requires: "moduleResolution": "NodeNext"
 
-// ─── Barrel file (index.ts) — expose a clean public API ───
-// src/features/users/index.ts
-export { UserCard }     from "./UserCard";
-export { useUsers }     from "./useUsers";
-export type { UserDto } from "./types";
+// ❌ ERROR: Relative import paths need explicit file extensions in ECMAScript imports.
+import { calculate } from './utils/calculator';
 
-// Consumers import from the feature, not the internals:
-import { UserCard, useUsers } from "@/features/users";
+// ✅ CORRECT: TypeScript knows to look for 'calculator.ts' during type-checking.
+import { calculate } from './utils/calculator.js';
 
-// ─── Namespace import for utility modules ───
-import * as DateUtils from "./date-utils";
-DateUtils.formatISO(new Date());`,
-            language: "ts",
+// ✅ CORRECT: Type-only imports do not need extensions because they are erased.
+import type { CalculationOptions } from './utils/calculator';`,
+            language: "typescript",
+          },
+          {
+            title: "esModuleInterop bridging the gap",
+            description:
+              "How 'esModuleInterop' makes importing legacy CommonJS modules seamless in TypeScript.",
+            code: `// Imagine 'legacy-logger' is an old CommonJS package exported via module.exports = Logger;
+
+// ❌ Without "esModuleInterop": true
+import * as Logger from 'legacy-logger';
+// You might have to call Logger.default() which is messy.
+
+// ✅ With "esModuleInterop": true
+import Logger from 'legacy-logger';
+// TypeScript automatically generates a wrapper in the compiled code
+// that seamlessly handles the require() interop under the hood.
+const log = new Logger();`,
+            language: "typescript",
           },
         ],
       },

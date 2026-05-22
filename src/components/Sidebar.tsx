@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { ChevronDown, ChevronRight, ArrowLeft } from "lucide-react";
 import * as Icons from "lucide-react";
-import { technologies } from "@/data/technologies";
+import { technologies, techCategories } from "@/data/technologies";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useState, createElement, type ComponentType } from "react";
+import { useState, createElement, type ComponentType, Suspense } from "react";
 import type { TopicNode } from "@/data/types";
 import styles from "./Sidebar.module.css";
 
@@ -69,7 +69,59 @@ function SidebarTreeNode({ node, depth = 0, techId, activeTopic, onToggle, expan
   );
 }
 
-export function Sidebar() {
+/** Home-page sidebar: technologies grouped by category with collapsible sections. */
+function TechCategoryList() {
+  const techById = new Map(technologies.map(t => [t.id, t]));
+  // All categories expanded by default
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+
+  const toggle = (label: string) => {
+    setCollapsed(prev => ({ ...prev, [label]: !prev[label] }));
+  };
+
+  return (
+    <div className="space-y-1">
+      {techCategories.map(category => {
+        const isCollapsed = collapsed[category.label] ?? false;
+        const techs = category.ids.map(id => techById.get(id)).filter(Boolean);
+        if (techs.length === 0) return null;
+        return (
+          <div key={category.label}>
+            <button
+              onClick={() => toggle(category.label)}
+              className={`${styles.categoryHeader} w-full flex items-center justify-between px-2 py-1.5 text-left`}
+            >
+              <span className="text-xs font-semibold text-(--text-3) uppercase tracking-wider">
+                {category.label}
+              </span>
+              {isCollapsed
+                ? <ChevronRight className="h-3 w-3 text-(--text-3)" />
+                : <ChevronDown className="h-3 w-3 text-(--text-3)" />}
+            </button>
+            {!isCollapsed && (
+              <ul className="space-y-0.5 text-sm mb-1">
+                {techs.map(tech => (
+                  <li key={tech!.id}>
+                    <Link
+                      href={`/tech/${tech!.id}`}
+                      className="text-(--text-2) hover:text-(--text-1) flex items-center gap-2 px-2 py-1.5 rounded hover:bg-(--bg-elevated) transition-colors"
+                    >
+                      <i className={`${tech!.deviconClass} text-lg shrink-0`} />
+                      <span className="flex-1">{tech!.name}</span>
+                      <ChevronRight className="h-3.5 w-3.5 text-(--text-3) shrink-0" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function SidebarContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const activeTopic = searchParams.get("topic");
@@ -132,28 +184,16 @@ export function Sidebar() {
           </ul>
         </div>
       ) : (
-        <div className="space-y-6">
-          <div>
-            <h4 className="text-xs font-semibold text-(--text-3) uppercase tracking-wider mb-2 px-2">TECHNOLOGIES</h4>
-            <ul className="space-y-0.5 text-sm">
-              {technologies.map(tech => {
-                return (
-                  <li key={tech.id}>
-                    <Link
-                      href={`/tech/${tech.id}`}
-                      className="text-(--text-2) hover:text-(--text-1) flex items-center gap-2 px-2 py-1.5 rounded hover:bg-(--bg-elevated) transition-colors"
-                    >
-                      <i className={`${tech.deviconClass} text-lg shrink-0`} />
-                      <span className="flex-1">{tech.name}</span>
-                      <ChevronRight className="h-3.5 w-3.5 text-(--text-3) shrink-0" />
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </div>
+        <TechCategoryList />
       )}
     </aside>
+  );
+}
+
+export function Sidebar() {
+  return (
+    <Suspense fallback={<aside className="sidebar-scroll fixed left-0 top-14 z-40 hidden h-[calc(100vh-3.5rem)] w-(--sidebar-w,16rem) md:block overflow-y-auto border-r border-(--border) bg-(--bg-root) py-5 px-2" />}>
+      <SidebarContent />
+    </Suspense>
   );
 }

@@ -22,6 +22,32 @@ export const databasesPerformance: TopicNode = {
     ],
     examples: [
       {
+        title: "The N+1 Query Problem",
+        description: "A common performance killer in modern applications using ORMs. Fetching a list of records, and then running a separate query for each record's relations.",
+        code: `// ❌ THE BAD WAY (N+1 Problem)
+// 1 query to get 50 users...
+const users = await db.query('SELECT * FROM users LIMIT 50');
+
+for (const user of users) {
+  // ...and 50 individual queries to get their posts! (51 queries total)
+  const posts = await db.query('SELECT * FROM posts WHERE user_id = ?', [user.id]);
+  user.posts = posts;
+}
+
+// ✅ THE GOOD WAY (2 Queries total)
+const users = await db.query('SELECT * FROM users LIMIT 50');
+const userIds = users.map(u => u.id);
+
+// Use the SQL 'IN' clause to fetch all posts in a single round-trip
+const allPosts = await db.query('SELECT * FROM posts WHERE user_id IN (?)', [userIds]);
+
+// Then stitch them together in memory (JavaScript is fast, network I/O is slow)
+users.forEach(user => {
+  user.posts = allPosts.filter(p => p.user_id === user.id);
+});`,
+        language: "javascript",
+      },
+      {
         title: "Cache-aside pattern",
         description: "Cache only the expensive read path and invalidate on writes.",
         code: `async function getAccountSummary(accountId: string) {

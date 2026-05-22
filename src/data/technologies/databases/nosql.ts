@@ -18,7 +18,45 @@ export const databasesNoSql: TopicNode = {
     commonPitfalls: [
       "Choosing NoSQL just because it sounds more scalable, without understanding the access pattern.",
       "Using a poor partition key and creating hot shards under load.",
-      "Recreating relational joins at the application layer and losing the benefit of the chosen store.",
+      "Recreating relational joins at the application layer (doing N+1 lookups) and losing the benefit of the chosen store.",
+    ],
+    examples: [
+      {
+        title: "MongoDB: Embedding vs Referencing",
+        description: "In NoSQL, you must design your schema based on how the application queries the data, not just how the data relates to itself.",
+        code: `// ─── APPROACH 1: Embedding (Denormalization) ───
+// Use when: Data is accessed together, and the embedded array won't grow infinitely.
+// Example: A User and their primary shipping addresses.
+const userDocument = {
+  _id: ObjectId("507f191e810c19729de860ea"),
+  name: "Alice",
+  email: "alice@example.com",
+  addresses: [
+    { street: "123 Main St", city: "NY", zip: "10001" },
+    { street: "456 Market St", city: "SF", zip: "94105" }
+  ]
+};
+// PROS: One single query fetches everything. Fast reads.
+// CONS: Updating an address requires finding the user first.
+
+// ─── APPROACH 2: Referencing (Normalization) ───
+// Use when: Data is queried independently, or the "many" side of a relationship is huge.
+// Example: A Publisher and thousands of Books.
+const publisherDocument = {
+  _id: "pub_123",
+  name: "Tech Press",
+  founded: 1999
+};
+
+const bookDocument = {
+  _id: "book_999",
+  title: "Learning NoSQL",
+  publisher_id: "pub_123" // Reference
+};
+// PROS: Books can grow infinitely without hitting the 16MB document limit.
+// CONS: Requires two queries (or a $lookup pipeline) to fetch Publisher + Books.`,
+        language: "javascript",
+      }
     ],
   },
   children: [

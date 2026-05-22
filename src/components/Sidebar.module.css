@@ -11,3 +11,12 @@
 .treeItemActive {
   background-color: color-mix(in srgb, var(--accent) 15%, transparent);
 }
+
+/* Category group header — collapsible section button on the home page */
+.categoryHeader {
+  border-radius: 4px;
+  transition: background-color 0.15s;
+}
+.categoryHeader:hover {
+  background-color: var(--bg-elevated);
+}

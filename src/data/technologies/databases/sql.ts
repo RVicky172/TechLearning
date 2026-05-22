@@ -21,16 +21,30 @@ export const databasesSql: TopicNode = {
     ],
     examples: [
       {
+        title: "INNER JOIN vs LEFT JOIN",
+        description: "Understanding the difference between the most common join types is critical for accurate reporting.",
+        code: `-- INNER JOIN: Returns ONLY users who have made an order.
+SELECT u.name, o.total_amount
+FROM users u
+INNER JOIN orders o ON u.id = o.user_id;
+
+-- LEFT JOIN: Returns ALL users. If they haven't made an order, total_amount will be NULL.
+SELECT u.name, o.total_amount
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id;`,
+        language: "sql",
+      },
+      {
         title: "Keyset pagination and aggregation",
-        description: "Prefer cursor-based reads for large ordered datasets.",
-        code: `-- Keyset pagination
+        description: "Prefer cursor-based reads for large ordered datasets over OFFSET.",
+        code: `-- Keyset pagination (Fast, uses index on created_at)
 SELECT id, email, created_at
 FROM users
 WHERE created_at < $1
 ORDER BY created_at DESC
 LIMIT 20;
 
--- Reporting query
+-- Reporting query with aggregations
 SELECT plan_id, COUNT(*) AS subscribers, SUM(amount) AS revenue
 FROM subscriptions
 WHERE status = 'active'
