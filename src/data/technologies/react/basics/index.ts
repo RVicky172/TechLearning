@@ -13,6 +13,7 @@ import { virtualDom } from "./virtualDom";
 import { diffing } from "./diffing";
 import { renderPipeline } from "./renderPipeline";
 import { hydration } from "./hydration";
+import { builtInComponents } from "./builtInComponents";
 
 export const reactBasics: TopicNode = {
   id: "react-basics",
@@ -89,5 +90,6 @@ function Footer() {
     forms,
     propsDrilling,
     lifecycleMethods,
+    builtInComponents,
   ],
 };
