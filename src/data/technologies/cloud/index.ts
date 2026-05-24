@@ -4,11 +4,16 @@ import { cloudCompute } from "./compute";
 import { cloudContainers } from "./containers";
 import { cloudDelivery } from "./delivery";
 import { cloudReliability } from "./reliability";
+import { cloudAWS } from "./aws";
+import { cloudProviders } from "./providers";
+import { cloudPlatformDeploy } from "./platformDeploy";
+import { cloudServerless } from "./serverless";
+import { cloudIaC } from "./iac";
 
 const cloud: Technology = {
   id: "cloud",
   name: "Cloud Infrastructure",
-  description: "Cloud-native systems, deployment models, operations, and platform skills used to run modern software.",
+  description: "AWS, GCP, Azure, serverless, IaC (Terraform/Pulumi), and end-to-end deployment guides for fullstack apps.",
   color: "bg-sky-600",
   iconName: "Cloud",
   deviconClass: "devicon-amazonwebservices-plain-wordmark colored",
@@ -16,6 +21,11 @@ const cloud: Technology = {
     cloudFundamentals,
     cloudCompute,
     cloudContainers,
+    cloudAWS,
+    cloudProviders,
+    cloudServerless,
+    cloudIaC,
+    cloudPlatformDeploy,
     cloudDelivery,
     cloudReliability,
   ],

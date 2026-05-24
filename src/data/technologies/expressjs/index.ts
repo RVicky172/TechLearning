@@ -2,6 +2,10 @@ import type { Technology } from "@/data/types";
 import { expressFundamentals } from "@/data/technologies/expressjs/fundamentals";
 import { expressMiddleware } from "@/data/technologies/expressjs/middleware";
 import { expressRouting } from "@/data/technologies/expressjs/routing";
+import { expressCors } from "@/data/technologies/expressjs/cors";
+import { expressAuthentication } from "@/data/technologies/expressjs/authentication";
+import { expressValidation } from "@/data/technologies/expressjs/validation";
+import { expressSecurity } from "@/data/technologies/expressjs/security";
 import { expressAsyncBehavior } from "@/data/technologies/expressjs/asyncBehavior";
 import { expressInterviewQuestions } from "@/data/technologies/expressjs/interviewQuestions";
 
@@ -16,6 +20,10 @@ const expressjs: Technology = {
     expressFundamentals,
     expressMiddleware,
     expressRouting,
+    expressCors,
+    expressAuthentication,
+    expressValidation,
+    expressSecurity,
     expressAsyncBehavior,
     expressInterviewQuestions,
   ],

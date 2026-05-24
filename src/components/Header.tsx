@@ -4,8 +4,15 @@ import Link from "next/link";
 import { Search, Sun, Moon, Menu, Cpu } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { SearchModal } from "./SearchModal";
+import dynamic from "next/dynamic";
 import styles from "./Header.module.css";
+
+// Lazy-load the search modal — it's a heavy overlay (fuzzy search + full
+// tech/topic index) that is never rendered on the initial page load.
+const SearchModal = dynamic(
+  () => import("./SearchModal").then((m) => m.SearchModal),
+  { ssr: false }
+);
 
 export function Header() {
   const { theme, toggle } = useTheme();

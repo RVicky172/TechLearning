@@ -2,22 +2,46 @@ import type { TopicNode } from "@/data/types";
 
 export const fullstackApis: TopicNode = {
   id: "fullstack-apis",
-  title: "APIs (REST & GraphQL)",
+  title: "APIs and Communication Patterns",
   iconName: "Plug",
   theory:
-    "APIs (Application Programming Interfaces) define how frontends communicate with backends. REST is the dominant architectural style for web APIs; GraphQL is a query language that gives clients precise control over the data they receive.",
+    "APIs (Application Programming Interfaces) define how frontends, backends, and services communicate. In the market today, teams use several API styles and communication patterns depending on the product: REST, GraphQL, RPC, gRPC, WebSockets, Server-Sent Events, and Webhooks all solve different integration problems.",
   theoryDetail: {
     keyConcepts: [
-      "REST uses HTTP methods and resource URLs to perform CRUD operations",
-      "GraphQL exposes a single endpoint and lets clients specify exactly what data they need",
-      "API versioning strategies: URL path (/v1/), header (Accept-Version), or query param",
+      "REST uses HTTP methods and resource URLs for predictable CRUD-style APIs",
+      "GraphQL exposes a typed schema and lets clients request exactly the fields they need",
+      "RPC and gRPC model operations as procedures or commands rather than resources",
+      "WebSockets and Server-Sent Events support realtime or streaming updates",
+      "Webhooks are server-to-server event callbacks triggered when something happens",
+      "API versioning strategies include URL paths (/v1), headers, or contract/schema evolution depending on the style",
     ],
     whyItMatters:
-      "Frontend developers spend most of their time consuming APIs. Understanding REST conventions and GraphQL queries helps you design better integrations, debug failures faster, and communicate clearly with backend teams.",
+      "Engineers rarely work with only one API style. A frontend may consume REST and GraphQL, a backend may expose webhooks, and internal services may use gRPC. Understanding the differences helps you choose the right communication model and debug integrations faster.",
     commonPitfalls: [
-      "Over-fetching with REST (receiving unused fields) or under-fetching (requiring multiple round trips)",
-      "Not handling API errors distinctly — network failures, 4xx, and 5xx need different UX responses",
-      "Ignoring rate limits and not implementing exponential back-off on retries",
+      "Treating all API types as interchangeable instead of choosing based on product requirements",
+      "Using advanced protocols because they are trendy rather than because the system benefits from them",
+      "Not handling API errors distinctly — network failures, 4xx, 5xx, timeouts, and retries need different behavior",
+      "Ignoring rate limits, retries, idempotency, and authentication differences across API styles",
+    ],
+    comparisons: [
+      {
+        title: "REST vs GraphQL vs RPC/gRPC",
+        summary: "Different styles solve different problems rather than replacing each other universally.",
+        points: [
+          "REST is easy to debug, cache-friendly, and widely understood across teams.",
+          "GraphQL is useful when clients need flexible, nested data shapes without many round trips.",
+          "RPC and gRPC are useful when workflows are action-oriented or when internal service contracts need strong performance and typing.",
+        ],
+      },
+      {
+        title: "Realtime vs event-driven integrations",
+        summary: "Persistent connections and asynchronous callbacks are not the same thing.",
+        points: [
+          "WebSockets keep a two-way connection open for bidirectional communication.",
+          "Server-Sent Events keep a simpler one-way stream open from server to client.",
+          "Webhooks send callbacks after events occur and do not require a persistent connection.",
+        ],
+      },
     ],
     examples: [
       {
@@ -133,6 +157,151 @@ mutation CreatePost($input: CreatePostInput!) {
 }`,
             language: "graphql",
           },
+        ],
+      },
+    },
+    {
+      id: "fullstack-rpc",
+      title: "RPC and tRPC",
+      iconName: "Workflow",
+      theory:
+        "RPC means Remote Procedure Call. Instead of modeling everything as resources, RPC-style APIs model commands or operations such as sendOtp, calculateShipping, or completeCheckout.",
+      theoryDetail: {
+        keyConcepts: [
+          "RPC endpoints are action-oriented rather than resource-oriented.",
+          "tRPC is a TypeScript-first RPC approach that gives end-to-end type safety between frontend and backend.",
+          "RPC is often a better fit when workflows are command-heavy and REST resource semantics feel forced.",
+        ],
+        whyItMatters:
+          "Many real product flows are action-driven, not CRUD-driven. RPC can feel simpler and more natural for multi-step business actions, especially in internal applications.",
+        commonPitfalls: [
+          "Turning every endpoint into a custom action and losing the benefits of standard HTTP semantics.",
+          "Over-coupling frontend and backend contracts too tightly.",
+          "Using RPC externally without clear documentation or versioning discipline.",
+        ],
+        examples: [
+          {
+            title: "Action-oriented endpoints",
+            description: "A workflow API often looks more natural as commands than as pure resource CRUD.",
+            code: `POST /api/auth/send-otp
+POST /api/payments/charge
+POST /api/orders/:id/cancel`,
+            language: "bash",
+          },
+        ],
+      },
+    },
+    {
+      id: "fullstack-grpc",
+      title: "gRPC",
+      iconName: "Cable",
+      theory:
+        "gRPC is a high-performance RPC framework that uses Protocol Buffers and HTTP/2. It is widely used in internal microservice systems where strong contracts and efficient communication matter more than browser-native simplicity.",
+      theoryDetail: {
+        keyConcepts: [
+          "Schemas are defined in .proto files and code can be generated for many languages.",
+          "gRPC supports unary requests as well as client, server, and bidirectional streaming.",
+          "It is especially strong for internal service-to-service communication.",
+        ],
+        whyItMatters:
+          "Even if your public API is REST, your internal platform may still use gRPC. Understanding it helps when working with backend platforms and distributed systems.",
+        commonPitfalls: [
+          "Assuming gRPC is automatically the best fit for browser-facing APIs.",
+          "Underestimating debugging and tooling differences compared with JSON over HTTP.",
+          "Ignoring schema evolution concerns across many services.",
+        ],
+        examples: [
+          {
+            title: "gRPC service contract",
+            description: "The protocol is strongly schema-first and built around generated contracts.",
+            code: `service UserService {
+  rpc GetUser (GetUserRequest) returns (UserResponse);
+  rpc ListUsers (ListUsersRequest) returns (ListUsersResponse);
+}`,
+            language: "proto",
+          },
+        ],
+      },
+    },
+    {
+      id: "fullstack-realtime-apis",
+      title: "WebSockets and SSE",
+      iconName: "Radio",
+      theory:
+        "Some product features need live updates instead of standard request-response communication. WebSockets provide a full duplex connection, while Server-Sent Events provide a server-to-client stream over HTTP.",
+      theoryDetail: {
+        keyConcepts: [
+          "WebSockets support bidirectional realtime communication.",
+          "SSE is simpler when only the server needs to push updates to the client.",
+          "Polling is often simpler than both for low-frequency updates, so use realtime channels only when necessary.",
+        ],
+        whyItMatters:
+          "Notifications, live dashboards, chat, collaborative editing, and streaming progress updates all depend on choosing the right realtime delivery model.",
+        commonPitfalls: [
+          "Using WebSockets when simpler polling or SSE would be easier to operate.",
+          "Ignoring reconnect behavior and connection cleanup.",
+          "Forgetting that scaling realtime systems often needs shared state or pub/sub infrastructure.",
+        ],
+        examples: [
+          {
+            title: "SSE endpoint shape",
+            description: "SSE is often a practical middle ground for browser streaming updates.",
+            code: `GET /api/stream
+Content-Type: text/event-stream
+
+data: {"status":"processing"}
+
+data: {"status":"completed"}`,
+            language: "text",
+          },
+        ],
+      },
+    },
+    {
+      id: "fullstack-webhooks",
+      title: "Webhooks",
+      iconName: "Webhook",
+      theory:
+        "Webhooks are outbound HTTP callbacks that notify another system when an event happens. Stripe, GitHub, Slack, and many SaaS products rely on them for asynchronous integrations.",
+      theoryDetail: {
+        keyConcepts: [
+          "Webhooks are push-based event notifications between servers.",
+          "Consumers must verify signatures, handle retries, and make processing idempotent.",
+          "Webhook receivers usually acknowledge quickly and process heavy work asynchronously.",
+        ],
+        whyItMatters:
+          "Modern integrations depend heavily on webhook workflows. Payments, CI/CD, CRM, ecommerce, and messaging platforms all use them.",
+        commonPitfalls: [
+          "Trusting webhook payloads without signature verification.",
+          "Doing long-running work before returning a 200 response.",
+          "Not making handlers idempotent, so retries create duplicate side effects.",
+        ],
+        examples: [
+          {
+            title: "Webhook receiver responsibilities",
+            description: "Receiving a webhook is not just defining a POST route; it requires safe event processing.",
+            code: `1. Verify provider signature
+2. Parse event safely
+3. Ignore duplicate event ids
+4. Queue background work if needed
+5. Return 200 quickly`,
+            language: "text",
+          },
+        ],
+      },
+    },
+    {
+      id: "fullstack-apis-express-reference",
+      title: "Building APIs with Express.js",
+      iconName: "ServerCog",
+      link: "https://expressjs.com/",
+      theory:
+        "Express.js is one of the most common Node.js frameworks for implementing REST APIs, middleware pipelines, authentication, validation, and webhook receivers. Use the Express.js section in this project for implementation-focused backend examples.",
+      theoryDetail: {
+        keyConcepts: [
+          "Express is a practical reference implementation for many HTTP API patterns taught here.",
+          "It is especially useful for learning middleware, routing, CORS, auth, validation, and production API structure.",
+          "You can study API concepts here first, then jump to the Express.js technology track for concrete code patterns.",
         ],
       },
     },

@@ -8,12 +8,27 @@ import * as Icons from "lucide-react";
 import { ExternalLink, CheckCircle, ChevronRight, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { CodeBlock } from "@/components/CodeBlock";
-import { CssPreview } from "@/components/CssPreview";
 import dynamic from "next/dynamic";
+import { QuestionAnswerRenderer } from "@/components/QuestionAnswerRenderer";
+import { TechnologyIcon } from "@/components/TechnologyIcon";
 
+function isQuestionAnswerList(items: string[] | undefined): boolean {
+  if (!items || items.length === 0) return false;
+  const qaPattern = /^\s*Q\d*[\).:\-]?\s*(.+?)\s+A:\s+(.+)$/i;
+  const matched = items.filter((item) => qaPattern.test(item)).length;
+  return matched / items.length >= 0.6;
+}
+
+// Lazy-load heavy leaf-topic components — they are only rendered when a user
+// navigates to a specific topic that has code examples or a live demo.
+const CodeBlock = dynamic(
+  () => import("@/components/CodeBlock").then((m) => m.CodeBlock)
+);
+const CssPreview = dynamic(
+  () => import("@/components/CssPreview").then((m) => m.CssPreview)
+);
 const HookDemoRenderer = dynamic(
-  () => import("@/components/react-hooks/HookDemoRenderer").then(m => m.HookDemoRenderer),
+  () => import("@/components/react-hooks/HookDemoRenderer").then((m) => m.HookDemoRenderer),
   { ssr: false }
 );
 
@@ -108,7 +123,7 @@ function TechPageContent({ tech }: { tech: Technology }) {
         className="mb-10"
       >
         <div className="flex items-center gap-4 mb-3">
-          <i className={`${tech.deviconClass} text-5xl md:text-6xl`} />
+          <TechnologyIcon technology={tech} size="lg" />
           <h1 className="text-4xl md:text-5xl font-bold text-(--text-1) tracking-tight">
             {tech.name} documentation
           </h1>
@@ -192,6 +207,8 @@ function TechPageContent({ tech }: { tech: Technology }) {
 
 function TopicSection({ node, techId }: { node: TopicNode; techId: string }) {
   const hasChildren = node.children && node.children.length > 0;
+  const keyConcepts = node.theoryDetail?.keyConcepts;
+  const keyConceptsAreInterviewQA = isQuestionAnswerList(keyConcepts);
 
   return (
     <motion.section
@@ -222,18 +239,18 @@ function TopicSection({ node, techId }: { node: TopicNode; techId: string }) {
         )}
         {node.theoryDetail && (
           <div className="mt-6 space-y-5">
+            {keyConcepts && keyConcepts.length > 0 && keyConceptsAreInterviewQA && (
+              <div className="min-w-0 bg-(--bg-surface) border border-(--border) rounded-xl p-5 md:p-6">
+                <h4 className="text-xs font-semibold text-(--accent-fg) uppercase tracking-wider mb-4">Interview Questions and Answers</h4>
+                <QuestionAnswerRenderer items={keyConcepts} />
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {node.theoryDetail.keyConcepts && node.theoryDetail.keyConcepts.length > 0 && (
+            {keyConcepts && keyConcepts.length > 0 && !keyConceptsAreInterviewQA && (
               <div className="min-w-0 bg-(--accent-subtle) border border-(--accent-subtle) rounded-xl p-5 md:p-6">
                 <h4 className="text-xs font-semibold text-(--accent-fg) uppercase tracking-wider mb-4">Key Concepts</h4>
-                <ul className="space-y-3">
-                  {node.theoryDetail.keyConcepts.map((c, i) => (
-                    <li key={i} className="min-w-0 text-sm text-(--text-2) flex items-start gap-2 leading-relaxed">
-                      <span className="text-(--accent-fg) mt-1 shrink-0">•</span>
-                      <span className="min-w-0 flex-1 wrap-anywhere whitespace-normal">{c}</span>
-                    </li>
-                  ))}
-                </ul>
+                <QuestionAnswerRenderer items={keyConcepts} />
               </div>
             )}
             {node.theoryDetail.whyItMatters && (

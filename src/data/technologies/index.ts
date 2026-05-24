@@ -23,6 +23,19 @@ import fullstack from "@/data/technologies/fullstack";
 import ai from "@/data/technologies/ai";
 import dsa from "@/data/technologies/dsa";
 import webpack from "@/data/technologies/webpack";
+import docker from "@/data/technologies/docker";
+import redis from "@/data/technologies/redis";
+import vite from "@/data/technologies/vite";
+import tailwind from "@/data/technologies/tailwind";
+import tanstackQuery from "@/data/technologies/tanstack-query";
+import zustand from "@/data/technologies/zustand";
+import websockets from "@/data/technologies/websockets";
+import nginx from "@/data/technologies/nginx";
+import linux from "@/data/technologies/linux";
+import authentication from "@/data/technologies/authentication";
+import webSecurity from "@/data/technologies/web-security";
+import designPatterns from "@/data/technologies/design-patterns";
+import monitoring from "@/data/technologies/monitoring";
 
 export const technologies = [
 	react,
@@ -32,49 +45,66 @@ export const technologies = [
 	html,
 	css,
 	scss,
+	tailwind,
+	vite,
 	redux,
+	zustand,
+	tanstackQuery,
 	nodejs,
 	expressjs,
 	databases,
 	orm,
 	graphql,
+	redis,
+	websockets,
 	testing,
 	git,
 	cicd,
+	docker,
+	nginx,
+	linux,
 	packageManagers,
 	environment,
 	cloud,
+	monitoring,
 	fullstack,
 	ai,
 	dsa,
 	webpack,
+	authentication,
+	webSecurity,
+	designPatterns,
 ];
 
 /** Sidebar category groupings — drives the grouped view on the home page. */
 export const techCategories: Array<{ label: string; ids: string[] }> = [
 	{
 		label: "Frontend",
-		ids: ["react", "nextjs", "javascript", "typescript", "html", "css", "scss"],
+		ids: ["react", "nextjs", "javascript", "typescript", "html", "css", "scss", "tailwind", "vite"],
 	},
 	{
 		label: "State Management",
-		ids: ["redux"],
+		ids: ["redux", "zustand", "tanstack-query"],
 	},
 	{
 		label: "Backend",
-		ids: ["nodejs", "expressjs", "databases", "orm", "graphql"],
+		ids: ["nodejs", "expressjs", "databases", "orm", "graphql", "redis", "websockets"],
 	},
 	{
 		label: "Testing & Quality",
 		ids: ["testing"],
 	},
 	{
+		label: "Security",
+		ids: ["authentication", "web-security"],
+	},
+	{
 		label: "DevOps & Tools",
-		ids: ["git", "cicd", "packageManagers", "environment", "cloud", "webpack"],
+		ids: ["git", "cicd", "docker", "nginx", "linux", "packageManagers", "environment", "cloud", "monitoring", "webpack"],
 	},
 	{
 		label: "Computer Science",
-		ids: ["dsa", "ai"],
+		ids: ["dsa", "ai", "design-patterns"],
 	},
 	{
 		label: "Architecture",

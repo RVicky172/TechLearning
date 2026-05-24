@@ -151,6 +151,7 @@ Top-level order in `react/index.ts`:
 - State Management Strategy
 - useEffect & Side Effects
 - Performance Optimization
+- Debugging and DevTools
 - React Compiler
 - React security concerns
 - Server Components
@@ -190,8 +191,10 @@ Top-level order in `react/index.ts`:
 
 - Fundamentals Q&A
 - Hooks & State Q&A
+- Rendering & Lifecycle Q&A
 - Performance Q&A
 - Architecture Q&A
+- System Design & Scenario Q&A
 
 ## How It Works
 

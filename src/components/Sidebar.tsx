@@ -7,6 +7,7 @@ import { technologies, techCategories } from "@/data/technologies";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState, createElement, type ComponentType, Suspense } from "react";
 import type { TopicNode } from "@/data/types";
+import { TechnologyIcon } from "@/components/TechnologyIcon";
 import styles from "./Sidebar.module.css";
 
 type LucideIcon = ComponentType<{ className?: string }>;
@@ -106,7 +107,7 @@ function TechCategoryList() {
                       href={`/tech/${tech!.id}`}
                       className="text-(--text-2) hover:text-(--text-1) flex items-center gap-2 px-2 py-1.5 rounded hover:bg-(--bg-elevated) transition-colors"
                     >
-                      <i className={`${tech!.deviconClass} text-lg shrink-0`} />
+                      <TechnologyIcon technology={tech!} size="sm" />
                       <span className="flex-1">{tech!.name}</span>
                       <ChevronRight className="h-3.5 w-3.5 text-(--text-3) shrink-0" />
                     </Link>
@@ -164,7 +165,7 @@ function SidebarContent() {
               <ArrowLeft className="w-3 h-3" /> All Technologies
             </Link>
             <div className="flex items-center gap-2">
-              <i className={`${currentTech.deviconClass} text-xl`} />
+              <TechnologyIcon technology={currentTech} size="sm" />
               <p className="text-xs font-semibold text-(--text-2) uppercase tracking-wider">{currentTech.name}</p>
             </div>
           </div>

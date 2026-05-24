@@ -5,53 +5,73 @@ export const reactInterviewQuestions: TopicNode = {
   title: "Interview Questions",
   iconName: "HelpCircle",
   theory:
-    "This section focuses on high-frequency React interview questions asked in frontend and full-stack roles. Each question is framed with senior-level expectations: clear mental models, trade-offs, and practical implementation details.",
+    "This section contains 60 high-frequency React interview questions across fundamentals, hooks, rendering, performance, architecture, and scenario-based design. Answers are written with real-world trade-offs and production-oriented reasoning.",
   theoryDetail: {
     keyConcepts: [
-      "Interview-ready answers balance correctness, trade-offs, and real-world constraints",
-      "Focus on React mental models: rendering, reconciliation, state ownership, and side effects",
-      "Good answers include a practical example, a common pitfall, and a mitigation strategy",
+      "60 interview questions are grouped by theme so you can practice systematically and track weak areas",
+      "Strong answers explain what, why, and when to use a pattern, not just definitions",
+      "Interview readiness comes from trade-offs: performance vs readability, abstraction vs simplicity, and local vs global state",
     ],
     whyItMatters:
-      "Strong interview performance comes from structured reasoning, not memorized definitions. This section trains you to explain React choices under production constraints.",
+      "React interviews evaluate reasoning quality more than memorization. Practicing structured answers around trade-offs, edge cases, and implementation details improves both interview performance and day-to-day engineering decisions.",
     commonPitfalls: [
-      "Giving definition-only answers without explaining impact on user experience or maintainability",
-      "Mixing framework concerns (Next.js specifics) with core React fundamentals in basic questions",
-      "Ignoring performance and accessibility implications when describing solutions",
+      "Answering with one-liners and skipping trade-offs",
+      "Using advanced APIs in answers when simpler patterns are enough",
+      "Ignoring accessibility, error handling, and testing implications",
     ],
   },
   children: [
     {
+      id: "react-iq-easy",
+      title: "Easy",
+      iconName: "CircleCheck",
+      theory:
+        "Foundational React interview questions covering JSX, state basics, rendering model, and hooks fundamentals.",
+      children: [
+    {
       id: "react-iq-fundamentals",
       title: "Fundamentals Q&A",
       iconName: "BookOpen",
-      theory: "Core React concepts that interviewers use to test baseline depth.",
+      theory: "Core conceptual questions used to validate React foundations.",
       theoryDetail: {
+        keyConcepts: [
+          "Q1. What is React and why is it called declarative? A: You describe desired UI for a state, and React handles DOM updates.",
+          "Q2. What is JSX? A: A syntax extension compiled into React element calls; it is not HTML.",
+          "Q3. How is React different from Angular/Vue? A: React is primarily a UI library with a composable ecosystem.",
+          "Q4. What is the virtual DOM? A: An in-memory representation React diffs before committing real DOM changes.",
+          "Q5. What is reconciliation? A: React's algorithm that compares previous and next trees to compute minimal updates.",
+          "Q6. Why are keys needed in lists? A: They preserve item identity across renders and avoid state mismatches.",
+          "Q7. Why is one-way data flow useful? A: It makes ownership and updates predictable, simplifying debugging.",
+          "Q8. What are controlled components? A: Inputs driven by React state with change handlers.",
+          "Q9. Controlled vs uncontrolled inputs? A: Controlled gives validation control; uncontrolled can reduce rerenders.",
+          "Q10. Why avoid mutating state directly? A: Mutation breaks change detection assumptions and causes stale UI bugs.",
+        ],
         examples: [
           {
-            title: "Q: Virtual DOM vs real DOM",
+            title: "Q: Virtual DOM vs Real DOM",
             description:
-              "A strong answer explains that React keeps an in-memory tree, diffs updates, and batches commits to the real DOM for predictable performance.",
-            code: `// Interview-style response skeleton
-// 1) What: Virtual DOM is a lightweight JS representation of the UI.
-// 2) How: On state change, React creates a new tree and diffs against previous.
-// 3) Why: It minimizes direct DOM writes and enables predictable updates.
-// 4) Caveat: Performance still depends on component design and key stability.`,
+              "A high-quality answer explains representation, diffing, and commit phases with caveats on poor component design.",
+            code: `// Interview answer framework
+// 1) Virtual DOM: lightweight in-memory UI representation.
+// 2) Re-render: creates a new tree from current state/props.
+// 3) Reconciliation: computes minimal set of changes.
+// 4) Commit: applies updates to real DOM.
+// 5) Caveat: expensive render logic can still hurt performance.`,
             language: "javascript",
           },
           {
-            title: "Q: Why are keys needed in lists?",
+            title: "Q: Why Keys Matter In Dynamic Lists",
             description:
-              "Mention identity across renders, state preservation, and why unstable keys (index/random) cause bugs.",
+              "Explain identity, reordering safety, and why index/random keys cause remounts and state drift.",
             code: `function List({ items }) {
   return items.map(item => (
-    // Stable identity per item across renders
+    // Stable identity preserves component state correctly
     <Row key={item.id} item={item} />
   ));
 }
 
-// Bad: key={index} in reorderable/filterable lists
-// Bad: key={Math.random()} (forces remount every render)`,
+// Avoid index key when items can reorder
+// Never use random keys`,
             language: "jsx",
           },
         ],
@@ -61,27 +81,38 @@ export const reactInterviewQuestions: TopicNode = {
       id: "react-iq-hooks-state",
       title: "Hooks & State Q&A",
       iconName: "Hook",
-      theory: "Questions around useState, useEffect, useMemo, useCallback, and state architecture.",
+      theory: "Questions around state ownership, hooks rules, effects, and modern React 19 hooks.",
       theoryDetail: {
+        keyConcepts: [
+          "Q11. What are the Rules of Hooks? A: Call hooks at top level in components or custom hooks only.",
+          "Q12. useState vs useReducer? A: useState for simple local updates; useReducer for complex transition logic.",
+          "Q13. What is stale closure in React? A: Function captures older values due to render snapshot semantics.",
+          "Q14. How do you fix stale closure issues? A: Correct dependencies, functional updates, refs, or effect events.",
+          "Q15. What is useEffect for? A: Synchronizing with external systems, not deriving render-only values.",
+          "Q16. When should useLayoutEffect be used? A: DOM measurement/mutation before paint to avoid visual flicker.",
+          "Q17. useMemo vs useCallback? A: useMemo caches values; useCallback caches function references.",
+          "Q18. What problem does useRef solve? A: Persist mutable values and access DOM nodes without rerender.",
+          "Q19. What is a custom hook? A: Reusable stateful logic packaged in a function starting with use.",
+          "Q20. How does useActionState help forms? A: It models submit pending/result/error with server or async actions.",
+        ],
         examples: [
           {
             title: "Q: useMemo vs useCallback",
             description:
-              "Explain that useMemo caches computed values; useCallback caches function references. Both are optimization tools, not default choices.",
+              "Clarify value caching vs function reference caching and mention both are optional optimizations.",
             code: `const visibleRows = useMemo(() => filterRows(rows, query), [rows, query]);
 const handleSave = useCallback((id) => saveRow(id), [saveRow]);
 
-// useMemo -> value
-// useCallback -> function reference`,
+// useMemo => memoized value
+// useCallback => memoized function reference`,
             language: "jsx",
           },
           {
-            title: "Q: How to avoid stale closures in effects",
+            title: "Q: Avoiding Stale Closures In Effects",
             description:
-              "Interviewers expect awareness of dependency arrays, functional updates, and separating event logic from effect logic.",
+              "Show functional updates and cleanup to prove understanding of closure-safe effect patterns.",
             code: `useEffect(() => {
   const id = setInterval(() => {
-    // Functional update avoids stale count capture
     setCount(c => c + 1);
   }, 1000);
 
@@ -93,37 +124,117 @@ const handleSave = useCallback((id) => saveRow(id), [saveRow]);
       },
     },
     {
+      id: "react-iq-rendering-lifecycle",
+      title: "Rendering & Lifecycle Q&A",
+      iconName: "RefreshCw",
+      theory: "Questions focused on render triggers, Strict Mode behavior, and lifecycle reasoning.",
+      theoryDetail: {
+        keyConcepts: [
+          "Q21. What causes a component to rerender? A: Local state, parent rerender, context changes, or hook/store updates.",
+          "Q22. Does rerender always mean DOM update? A: No, React may bail out during reconciliation.",
+          "Q23. What does React Strict Mode do in dev? A: Intentionally double-invokes some logic to surface side effects.",
+          "Q24. Why are effects run after paint by default? A: To keep UI responsive unless layout synchronization is required.",
+          "Q25. How do cleanup functions work in useEffect? A: Run before next effect and on unmount.",
+          "Q26. Why can index keys break state? A: Reordering reassigns identity and mixes child state.",
+          "Q27. What is hydration? A: Attaching React behavior to server-rendered HTML.",
+          "Q28. Hydration mismatch causes? A: Non-deterministic renders like Date.now or random values on first paint.",
+          "Q29. Class lifecycle mapping to hooks? A: componentDidMount/Update/Unmount are modeled with effects plus dependencies.",
+          "Q30. Should derived render data be in state? A: Usually no, compute from source state unless expensive.",
+        ],
+        examples: [
+          {
+            title: "Q: Why Strict Mode Seems To Render Twice",
+            description:
+              "This answer should separate dev-only checks from production behavior.",
+            code: `// Development-only behavior in Strict Mode:
+// - Render functions may run twice
+// - Effects mount -> cleanup -> mount
+// Goal: reveal non-idempotent side effects
+
+// Production build does not double invoke for this check.
+// Fix root issue: make side effects idempotent and cleanup correctly.`,
+            language: "javascript",
+          },
+          {
+            title: "Q: Hydration Mismatch Example",
+            description:
+              "Show deterministic rendering and delaying browser-only logic until after mount.",
+            code: `function Clock() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Avoid server/client mismatch for time-dependent output
+  if (!mounted) return <span>Loading...</span>;
+
+  return <span>{new Date().toLocaleTimeString()}</span>;
+}`,
+            language: "tsx",
+          },
+        ],
+      },
+    },
+      ],
+    },
+    {
+      id: "react-iq-medium",
+      title: "Medium",
+      iconName: "CircleDot",
+      theory:
+        "Mid-level React interview questions focused on optimization judgment and architecture trade-offs.",
+      children: [
+    {
       id: "react-iq-performance",
       title: "Performance Q&A",
       iconName: "Gauge",
-      theory: "Performance questions test your ability to profile first, then optimize surgically.",
+      theory: "Performance questions test profiling mindset, memoization judgment, and list scalability.",
       theoryDetail: {
+        keyConcepts: [
+          "Q31. First step in performance tuning? A: Measure with React DevTools Profiler before changing code.",
+          "Q32. When does React.memo help? A: When prop-stable components rerender frequently and render cost is non-trivial.",
+          "Q33. Why can useCallback hurt performance? A: It adds dependency management overhead when no memoized consumer exists.",
+          "Q34. How to optimize large lists? A: Virtualization, row memoization, stable keys, and avoiding inline heavy work.",
+          "Q35. What is windowing? A: Rendering only visible rows plus overscan, not the entire dataset.",
+          "Q36. useTransition use case? A: Keep urgent input responsive while deferring expensive update.",
+          "Q37. useDeferredValue use case? A: Render stale value while expensive recalculation catches up.",
+          "Q38. React Compiler impact? A: Automatic memoization in many paths, reducing manual memo boilerplate.",
+          "Q39. How to optimize context performance? A: Split contexts, memoize values, and reduce broad consumers.",
+          "Q40. What are common perf anti-patterns? A: Premature memoization, unstable object props, and heavy work during render.",
+        ],
         examples: [
           {
-            title: "Q: How would you optimize a slow React list?",
+            title: "Q: Optimizing A Slow Search Results List",
             description:
-              "Expected path: profile -> identify expensive rows -> memoize rows -> stabilize props -> add virtualization for large lists.",
-            code: `const Row = memo(function Row({ item, onSelect }) {
-  return <button onClick={() => onSelect(item.id)}>{item.name}</button>;
+              "Expected sequence: profile, identify heavy rows, stabilize props, memoize row, then virtualize.",
+            code: `const Row = memo(function Row({ item, onOpen }) {
+  return <button onClick={() => onOpen(item.id)}>{item.name}</button>;
 });
 
-function HugeList({ items }) {
-  const onSelect = useCallback((id) => {
-    console.log('select', id);
+function Results({ items }) {
+  const onOpen = useCallback((id) => {
+    console.log("open", id);
   }, []);
 
-  return items.map(item => <Row key={item.id} item={item} onSelect={onSelect} />);
+  return items.map(item => <Row key={item.id} item={item} onOpen={onOpen} />);
 }`,
             language: "jsx",
           },
           {
-            title: "Q: When should you avoid memoization?",
+            title: "Q: Transitioning Non-Urgent Updates",
             description:
-              "Great answer: avoid premature optimization for cheap components/computations; memoization adds complexity and memory overhead.",
-            code: `// Do not memoize by default.
-// Use React DevTools Profiler first.
-// Apply memo/useMemo/useCallback only where measurable bottlenecks exist.`,
-            language: "javascript",
+              "This demonstrates urgent input state vs deferred heavy filtering state.",
+            code: `const [query, setQuery] = useState("");
+const [isPending, startTransition] = useTransition();
+
+function onChange(next) {
+  setQuery(next); // urgent
+  startTransition(() => {
+    setFiltered(expensiveFilter(items, next)); // non-urgent
+  });
+}`,
+            language: "tsx",
           },
         ],
       },
@@ -132,346 +243,121 @@ function HugeList({ items }) {
       id: "react-iq-architecture",
       title: "Architecture Q&A",
       iconName: "Blocks",
-      theory: "Senior interviews often include architectural trade-offs around boundaries, state ownership, and rendering strategy.",
+      theory: "Senior-level architecture questions around boundaries, state choices, and data ownership.",
       theoryDetail: {
+        keyConcepts: [
+          "Q41. How do you decide local state vs context vs store? A: Choose the smallest shared scope that meets requirements.",
+          "Q42. Context vs Redux/Zustand? A: Context for distribution, store for complex update workflows and tooling.",
+          "Q43. Server state vs client state? A: Server state is fetched/cached/invalidation-driven; client state is local UI interaction state.",
+          "Q44. How should large React apps be organized? A: Feature-first folders with collocated UI, hooks, and tests.",
+          "Q45. What is prop drilling and when is it okay? A: Passing props through layers; acceptable for shallow, explicit paths.",
+          "Q46. What are container/presentational patterns today? A: Less rigid, but separation of data orchestration and UI still helps.",
+          "Q47. Why use Error Boundaries at route/widget level? A: To contain crashes and preserve the rest of the app.",
+          "Q48. How do you approach code splitting? A: Split by routes and heavy islands, not tiny low-value components.",
+          "Q49. What is a good React testing strategy? A: Mostly integration tests, selective unit tests, minimal brittle implementation checks.",
+          "Q50. How do you handle auth state in React apps? A: Provider/store for session state plus secure backend token handling.",
+        ],
         examples: [
           {
-            title: "Q: Context vs Redux vs React Query",
+            title: "Q: Context vs Store vs Query Libraries",
             description:
-              "Strong answer separates concerns: Context for shared config/auth, Redux/Zustand for complex client state, React Query for server state.",
-            code: `// Rule of thumb
-// Context: theme/auth/locale
-// Zustand/Redux: client domain state with complex workflows
-// React Query: server state (fetch/cache/retry/invalidation)
+              "Use this answer to separate shared config, client domain state, and async server cache concerns.",
+            code: `// Choose by problem category:
+// Context => theme/auth/locale distribution
+// Store => complex client workflows and derived state
+// Query lib => server cache, retries, invalidation
 
 // Avoid using one tool for every state problem.`,
             language: "javascript",
           },
           {
-            title: "Q: Server Components vs Client Components",
+            title: "Q: Error Boundary Placement Strategy",
             description:
-              "Explain that server components reduce client JS and fetch securely, while client components are for interactivity/hooks/browser APIs.",
-            code: `// Server component (default in Next.js app router)
-export default async function Page() {
-  const data = await fetchData();
-  return <ClientWidget initialData={data} />;
-}
+              "Demonstrates containing failures at route and widget boundaries for graceful degradation.",
+            code: `// Place boundaries at:
+// 1) App shell (last resort fallback)
+// 2) Route segment (page-level safety)
+// 3) Risky widgets (charts, rich editors)
 
-// Client component
-'use client';
-function ClientWidget({ initialData }) {
-  const [state, setState] = useState(initialData);
-  return <button onClick={() => setState([])}>Clear</button>;
+// Goal: one crashing widget should not blank the entire page.`,
+            language: "javascript",
+          },
+        ],
+      },
+    },
+      ],
+    },
+    {
+      id: "react-iq-hard",
+      title: "Hard / Advanced",
+      iconName: "Flame",
+      theory:
+        "Senior-level scenario and system-design interview questions for production React systems.",
+      children: [
+    {
+      id: "react-iq-system-design",
+      title: "System Design & Scenario Q&A",
+      iconName: "Network",
+      theory: "Scenario-driven questions where interviewers evaluate design decisions, not just API recall.",
+      theoryDetail: {
+        keyConcepts: [
+          "Q51. Design a search UI that stays responsive with 30k rows. A: Split urgent input from deferred filtering and virtualize results.",
+          "Q52. How would you prevent request race conditions? A: Abort previous fetches or rely on query-keyed cache tools.",
+          "Q53. How do you structure a 50-field form? A: Prefer form library + schema validation + focused subscriptions.",
+          "Q54. How would you build optimistic updates safely? A: Apply optimistic patch, rollback on failure, reconcile with server response.",
+          "Q55. Design offline-friendly React data flow. A: Cache reads, queue writes, sync/retry with conflict strategy.",
+          "Q56. How do you avoid state explosion in dashboards? A: Partition global, feature, and URL state with clear ownership.",
+          "Q57. How do you secure React output against XSS? A: Escape by default, sanitize HTML, avoid unsafe injection.",
+          "Q58. How do you monitor performance regressions? A: Profiler baselines, web vitals, and CI performance budgets.",
+          "Q59. How do you ship large React apps incrementally? A: Route-based code splitting and progressive feature rollout.",
+          "Q60. How do you migrate a legacy class app to hooks? A: Strangler pattern, feature-by-feature conversion with parity tests.",
+        ],
+        examples: [
+          {
+            title: "Q: Handle Race Conditions In Search",
+            description:
+              "Shows an abort-first approach to prevent stale responses from overwriting fresher results.",
+            code: `function useAbortableSearch() {
+  const controllerRef = useRef(null);
+
+  const search = useCallback(async (query) => {
+    controllerRef.current?.abort();
+    controllerRef.current = new AbortController();
+
+    const response = await fetch(\`/api/search?q=\${query}\`, {
+      signal: controllerRef.current.signal,
+    });
+
+    return response.json();
+  }, []);
+
+  return { search };
+}`,
+            language: "tsx",
+          },
+          {
+            title: "Q: Optimistic Update With Rollback",
+            description:
+              "Shows optimistic patching with rollback when API request fails.",
+            code: `const [todos, setTodos] = useState(initialTodos);
+
+async function addTodoOptimistic(text) {
+  const temp = { id: "temp-1", text };
+  setTodos(prev => [temp, ...prev]);
+
+  try {
+    const saved = await api.createTodo({ text });
+    setTodos(prev => prev.map(t => (t.id === temp.id ? saved : t)));
+  } catch {
+    setTodos(prev => prev.filter(t => t.id !== temp.id));
+  }
 }`,
             language: "tsx",
           },
         ],
       },
     },
-    {
-      id: "react-iq-system-design",
-      title: "System Design & Scenarios",
-      iconName: "Network",
-      theory: "Advanced interviews include real-world scenarios: designing a form system, state architecture for a large app, handling async data, and performance under constraints.",
-      theoryDetail: {
-        examples: [
-          {
-            title: "Q: Design a Form Management System (Controlled vs Uncontrolled)",
-            description:
-              "Discuss tradeoffs: controlled inputs (React state) vs uncontrolled (DOM refs). For forms, explain why libraries like React Hook Form use uncontrolled by default (reduce renders), but controlled when validation/cross-field deps needed.",
-            code: `// Scenario: Large form with 50 fields, complex validation
-// Controlled approach: every keystroke updates state → 50 renders per keystroke
-// Uncontrolled approach: refs + manual validation → fewer rerenders
-
-// Best practice: Hybrid
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-
-const schema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  confirmPassword: z.string(),
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-function SignupForm() {
-  const { register, handleSubmit, watch, formState: { errors } } = useForm({
-    resolver: zodResolver(schema),
-    defaultValues: { email: '', password: '', confirmPassword: '' },
-  });
-  
-  // Only watched fields trigger rerenders
-  const password = watch('password');
-  
-  const onSubmit = (data) => console.log(data);
-  
-  return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <input {...register('email')} placeholder="Email" />
-      {errors.email && <p>{errors.email.message}</p>}
-      
-      <input {...register('password')} type="password" placeholder="Password" />
-      {errors.password && <p>{errors.password.message}</p>}
-      
-      <input {...register('confirmPassword')} type="password" placeholder="Confirm" />
-      {errors.confirmPassword && <p>{errors.confirmPassword.message}</p>}
-      
-      <button type="submit">Sign Up</button>
-    </form>
-  );
-}
-
-// Key insights:
-// 1) Only watch fields you need for dynamic UI
-// 2) Validation rules centralized in schema
-// 3) Errors accessed without extra state
-// 4) Library handles re-render optimization`,
-            language: "tsx",
-          },
-          {
-            title: "Q: Design State Architecture for a Large Dashboard App",
-            description:
-              "Discuss: app-level state (auth, user prefs), feature-level state (open panels, filters), and server state (data). Explain tool selection and boundaries.",
-            code: `// Architecture layers for large app
-
-// 1. Global app state (auth, user, settings)
-// → Zustand or Context (small, accessed often)
-const useAppStore = create((set) => ({
-  user: null,
-  theme: 'light',
-  setUser: (user) => set({ user }),
-  setTheme: (theme) => set({ theme }),
-}));
-
-// 2. Feature state (dashboard filters, panels)
-// → Local state + URL params (searchParams for "shareability")
-function Dashboard() {
-  const [filters, setFilters] = useSearchParams();
-  const selectedPanel = filters.get('panel') || 'overview';
-  
-  return (
-    <div>
-      <Sidebar 
-        active={selectedPanel} 
-        onChange={(p) => setFilters({ panel: p })} 
-      />
-      {selectedPanel === 'overview' && <OverviewPanel />}
-      {selectedPanel === 'analytics' && <AnalyticsPanel />}
-    </div>
-  );
-}
-
-// 3. Server state (user data, reports)
-// → React Query (cache + invalidation + retry)
-function UserReport() {
-  const { data: report, isLoading, error } = useQuery({
-    queryKey: ['report', userId],
-    queryFn: () => fetch(\`/api/report/\${userId}\`).then(r => r.json()),
-    staleTime: 5 * 60 * 1000, // 5 min
-    retry: 2,
-  });
-  
-  if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage error={error} />;
-  return <ReportView data={report} />;
-}
-
-// Benefits:
-// - Each tool has clear responsibility
-// - Easy to test (zustand + react query are tested in isolation)
-// - Scalable (new features don't add to central store)`,
-            language: "tsx",
-          },
-          {
-            title: "Q: Handle Race Conditions in Data Fetching",
-            description:
-              "Common problem: user types a search, multiple fetch requests fire, older response arrives after newer one, shows stale data. Solutions: AbortController, React Query key versioning, or state timestamp.",
-            code: `// Problem scenario:
-// User types 'a' → fetch A fires
-// User types 'ab' → fetch B fires
-// Fetch B completes first
-// Fetch A completes after → state reverts to stale A data
-
-// Solution 1: AbortController (vanilla approach)
-function useAbortableFetch() {
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
-  const abortRef = useRef<AbortController | null>(null);
-  
-  const fetch = useCallback((url) => {
-    // Cancel previous request
-    abortRef.current?.abort();
-    abortRef.current = new AbortController();
-    
-    return window
-      .fetch(url, { signal: abortRef.current.signal })
-      .then(r => r.json())
-      .then(data => setData(data))
-      .catch(err => {
-        // Don't update state if aborted
-        if (err.name !== 'AbortError') setError(err);
-      });
-  }, []);
-  
-  return { data, error, fetch };
-}
-
-// Solution 2: React Query (handles automatically via queryKey)
-function SearchUsers({ query }) {
-  const { data: users } = useQuery({
-    queryKey: ['users', query], // Key includes query
-    queryFn: () => fetch(\`/api/users?q=\${query}\`).then(r => r.json()),
-    enabled: query.length > 0,
-  });
-  // Old query results are cached separately, never overwrite each other
-  return users?.map(u => <UserRow key={u.id} user={u} />);
-}
-
-// Solution 3: Timestamp check (detect stale updates)
-const [data, setData] = useState(null);
-const [requestTime, setRequestTime] = useState(0);
-
-const handleSearch = async (q) => {
-  const now = Date.now();
-  setRequestTime(now);
-  
-  const result = await fetch(\`/api/search?q=\${q}\`);
-  
-  // Ignore if newer request started
-  if (now < requestTime) return;
-  
-  setData(result);
-};
-
-// Best practice: Use React Query for server state, avoids these issues entirely`,
-            language: "tsx",
-          },
-          {
-            title: "Q: Virtualized List - Efficiently Render 10,000 Items",
-            description:
-              "Problem: Efficiently render 10,000 items without crashing the browser. Expected interview answer: avoid rendering all rows at once; use react-window (or custom windowing) so only visible rows are mounted.",
-            code: `// Problem:
-// Render 10,000 rows smoothly without browser jank or memory spikes.
-
-import { memo } from 'react';
-import { FixedSizeList, ListChildComponentProps } from 'react-window';
-
-type Item = { id: number; name: string };
-
-const Row = memo(function Row({
-  index,
-  style,
-  data,
-}: ListChildComponentProps<Item[]>) {
-  const item = data[index];
-  return (
-    <div style={style} className="border-b px-3 py-2">
-      #{item.id} - {item.name}
-    </div>
-  );
-});
-
-export function VirtualizedListExample() {
-  const items: Item[] = Array.from({ length: 10_000 }, (_, i) => ({
-    id: i + 1,
-    name: \`User \${i + 1}\`,
-  }));
-
-  return (
-    <FixedSizeList
-      height={420}      // viewport height
-      width={520}
-      itemCount={items.length}
-      itemSize={40}     // fixed row height
-      itemData={items}
-      overscanCount={6} // pre-render near viewport for smoother scroll
-    >
-      {Row}
-    </FixedSizeList>
-  );
-}
-
-// Interview-ready solution notes:
-// 1) react-window mounts only visible rows (+ overscan), not all 10,000 rows.
-// 2) DOM node count stays low, reducing memory and layout/paint cost.
-// 3) For variable row heights, use VariableSizeList.
-// 4) If library is not allowed, implement custom windowing with scrollTop + start/end index math.`,
-            language: "tsx",
-            output: `VirtualizedListExample (viewport: 420px, row: 40px)
-
-Visible DOM rows at a time: ~10-16 (plus overscan)
-Total dataset size: 10,000 rows
-
-Top of list:
-#1 - User 1
-#2 - User 2
-#3 - User 3
-...
-
-After scrolling to middle:
-#4988 - User 4988
-#4989 - User 4989
-#4990 - User 4990
-...
-
-Result: Smooth scroll, low memory usage, browser remains responsive.`,
-          },
-          {
-            title: "Q: Handle Async Loading States (Pending, Success, Error)",
-            description:
-              "Discuss state machine patterns for robust async handling. Avoid boolean flags (loading/error both true?) — use explicit state union types.",
-            code: `// ❌ Problematic: Multiple booleans can be inconsistent
-const [loading, setLoading] = useState(false);
-const [error, setError] = useState(null);
-const [data, setData] = useState(null);
-
-// What if loading && error are both true? Confusing.
-
-// ✅ Better: State machine with union types
-type AsyncState<T> =
-  | { status: 'idle' }
-  | { status: 'pending' }
-  | { status: 'success'; data: T }
-  | { status: 'error'; error: Error };
-
-function useAsync<T>(
-  fn: () => Promise<T>,
-  deps: unknown[]
-): AsyncState<T> {
-  const [state, setState] = useState<AsyncState<T>>({ status: 'idle' });
-  
-  useEffect(() => {
-    setState({ status: 'pending' });
-    fn()
-      .then(data => setState({ status: 'success', data }))
-      .catch(error => setState({ status: 'error', error }));
-  }, deps);
-  
-  return state;
-}
-
-// Usage
-function UserProfile({ userId }) {
-  const state = useAsync(() => fetch(\`/api/user/\${userId}\`).then(r => r.json()), [userId]);
-  
-  switch (state.status) {
-    case 'idle': return null;
-    case 'pending': return <LoadingSpinner />;
-    case 'success': return <Profile user={state.data} />;
-    case 'error': return <ErrorBoundary error={state.error} />;
-  }
-}
-
-// Benefits:
-// - Compiler enforces all states handled
-// - No impossible state combinations
-// - Clear, predictable flow`,
-            language: "tsx",
-          },
-        ],
-      },
+      ],
     },
   ],
 };

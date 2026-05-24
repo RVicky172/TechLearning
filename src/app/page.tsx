@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { technologies } from "@/data/technologies";
 import * as Icons from "lucide-react";
+import { TechnologyIcon } from "@/components/TechnologyIcon";
 
 export default function Home() {
   return (
@@ -56,7 +57,7 @@ export default function Home() {
                   className="bg-(--bg-surface) rounded-xl p-6 border border-(--border) transition-all duration-300 hover:border-(--border-hover) hover:bg-(--bg-elevated) h-full flex flex-col"
                 >
                   <div className="mb-4">
-                    <i className={`${tech.deviconClass} text-4xl`} />
+                    <TechnologyIcon technology={tech} size="md" />
                   </div>
                   <h3 className="text-lg font-semibold text-(--text-1) mb-2">{tech.name}</h3>
                   <p className="text-(--text-2) text-sm leading-relaxed">

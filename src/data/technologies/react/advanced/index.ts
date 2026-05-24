@@ -3,6 +3,7 @@ import { context } from "./context";
 import { stateStrategy } from "./stateStrategy";
 import { effects } from "./effects";
 import { performance } from "./performance";
+import { debuggingDevtools } from "./debuggingDevtools";
 import { virtualization } from "./virtualization";
 import { patterns } from "./patterns";
 import { batching } from "./batching";
@@ -16,6 +17,7 @@ import { architecture } from "./architecture";
 import { optimisticUpdates } from "./optimisticUpdates";
 import { urlState } from "./urlState";
 import { throttlingDebouncing } from "./throttlingDebouncing";
+import { concurrentRendering } from "./concurrentRendering";
 
 export const reactAdvanced: TopicNode = {
   id: "react-advanced",
@@ -46,6 +48,7 @@ export const reactAdvanced: TopicNode = {
   },
   children: [
     architecture,
+    concurrentRendering,
     serverComponents,
     suspenseStreaming,
     reactCompiler,
@@ -58,6 +61,7 @@ export const reactAdvanced: TopicNode = {
     batching,
     effects,
     performance,
+    debuggingDevtools,
     virtualization,
     patterns,
     accessibility,
