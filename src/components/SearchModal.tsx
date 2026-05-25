@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X, BookOpen } from "lucide-react";
 import { technologies } from "@/data/technologies";
@@ -32,7 +32,7 @@ function flattenTopics(
       techName,
       title: node.title,
       description: node.theory ?? "",
-      href: `/tech/${techId}#${node.id}`,
+      href: `/tech/${techId}?topic=${node.id}`,
     });
     if (node.children) {
       flattenTopics(node.children, techId, techName, results);
@@ -63,23 +63,25 @@ export function SearchModal({
   onClose: () => void;
 }) {
   const [query, setQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selected, setSelected] = useState(0);
+  const [isPending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   // Memoised so the keyboard effect dependency stays stable between renders
   const results = useMemo(
     () =>
-      query.trim().length > 0
+      searchQuery.trim().length > 0
         ? allItems
             .filter(
               r =>
-                r.title.toLowerCase().includes(query.toLowerCase()) ||
-                r.description.toLowerCase().includes(query.toLowerCase())
+                r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                r.description.toLowerCase().includes(searchQuery.toLowerCase())
             )
             .slice(0, 10)
         : [],
-    [query]
+    [searchQuery]
   );
 
   // Since this component unmounts when open=false (see early return below),
@@ -129,14 +131,24 @@ export function SearchModal({
             placeholder="Search technologies and topics..."
             value={query}
             onChange={e => {
-              setQuery(e.target.value);
+              const nextQuery = e.target.value;
+              setQuery(nextQuery);
               setSelected(0);
+
+              // Keep typing responsive while result filtering updates in the background.
+              startTransition(() => {
+                setSearchQuery(nextQuery);
+              });
             }}
           />
           <button className={styles.closeBtn} onClick={onClose}>
             <X className="w-4 h-4" />
           </button>
         </div>
+
+        {query.trim().length > 0 && isPending && (
+          <div className={styles.pending}>Updating results...</div>
+        )}
 
         {results.length > 0 && (
           <ul className={styles.results}>
@@ -172,7 +184,7 @@ export function SearchModal({
           </ul>
         )}
 
-        {query.trim().length > 0 && results.length === 0 && (
+        {query.trim().length > 0 && !isPending && results.length === 0 && (
           <div className={styles.empty}>
             No results for &quot;{query}&quot;
           </div>

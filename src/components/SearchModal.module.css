@@ -165,3 +165,9 @@
   color: var(--text-3);
   font-size: 14px;
 }
+
+.pending {
+  padding: 10px 14px 2px;
+  color: var(--text-3);
+  font-size: 12px;
+}

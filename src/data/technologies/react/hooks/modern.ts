@@ -1003,6 +1003,67 @@ export function UseActionStateDemo() {
 };
 
 // ─────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────
+// useFormStatus
+// ─────────────────────────────────────────────────────────
+
+
+export const hookUseFormStatus: TopicNode = {
+  id: "hook-useformstatus",
+  title: "useFormStatus",
+  iconName: "Loader",
+  link: "https://react.dev/reference/react-dom/hooks/useFormStatus",
+  theory:
+    "useFormStatus provides status information about the last form submission. It must be called from a component rendered inside a <form>. It solves the problem of needing to drill pending state down to submit buttons.",
+  theoryDetail: {
+    keyConcepts: [
+      "Must be called from a component rendered INSIDE a <form>",
+      "Returns { pending, data, method, action }",
+      "pending is true while the parent <form action> is executing",
+      "data contains the FormData object that was submitted",
+    ],
+    whyItMatters:
+      "Before this hook, you had to manage form pending state via manual useState or Context and pass it down. Now, deeply nested submit buttons can access the parent form's submit state automatically.",
+    commonPitfalls: [
+      "Calling it in the same component that renders the <form> — it won't work, it must be inside a child component",
+    ],
+    examples: [
+      {
+        title: "SubmitButton using useFormStatus",
+        description: "A component that disables itself when its parent form is submitting.",
+        language: "tsx",
+        code: `import { useFormStatus } from "react-dom";
+
+export function SubmitButton() {
+  // Read the status of the parent <form>
+  const { pending } = useFormStatus();
+
+  return (
+    <button 
+      type="submit" 
+      disabled={pending}
+      className={\`btn \${pending ? "opacity-50" : ""}\`}
+    >
+      {pending ? "Saving..." : "Save"}
+    </button>
+  );
+}
+
+// Usage in parent
+export function SettingsForm({ action }) {
+  return (
+    <form action={action}>
+      <input name="username" />
+      {/* SubmitButton reads the form status internally */}
+      <SubmitButton />
+    </form>
+  );
+}`,
+      },
+    ],
+  },
+};
+
 // useOptimistic
 // ─────────────────────────────────────────────────────────
 
@@ -1615,6 +1676,7 @@ export const modernHookTopics: TopicNode[] = [
   hookUseInsertionEffect,
   hookUse,
   hookUseActionState,
+  hookUseFormStatus,
   hookUseOptimistic,
   hookUseEffectEvent,
   hookUseStateEvent,

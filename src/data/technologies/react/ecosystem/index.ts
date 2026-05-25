@@ -9,6 +9,7 @@ import { formPatterns } from "./formPatterns";
 import { reactTestingLibrary } from "./reactTestingLibrary";
 import { stylingStrategies } from "./stylingStrategies";
 import { deploymentProduction } from "./deploymentProduction";
+import { framerMotion } from "./framerMotion";
 
 export const reactEcosystem: TopicNode = {
   id: "react-ecosystem",
@@ -25,6 +26,7 @@ export const reactEcosystem: TopicNode = {
       "Redux Toolkit standardizes Redux with createSlice, configureStore, and RTK Query for data fetching",
       "React Testing Library tests user-visible behavior — query by role, label, and text instead of implementation details",
       "React Hook Form handles complex forms with minimal re-renders; React 19 adds native form actions",
+      "Framer Motion handles declarative animations, layout transitions, and physics-driven micro-interactions",
       "Deployment ranges from static CDN hosting to serverless platforms (Vercel, Netlify) with CI/CD pipelines",
     ],
     whyItMatters:
@@ -37,6 +39,6 @@ export const reactEcosystem: TopicNode = {
       "Testing implementation details instead of user-visible behavior — makes tests fragile to refactoring",
     ],
   },
-  children: [reactRouter, routing, serverClientBoundaries, query, stateManagement, reduxToolkit, formPatterns, stylingStrategies, reactTestingLibrary, deploymentProduction],
+  children: [reactRouter, routing, serverClientBoundaries, query, stateManagement, reduxToolkit, formPatterns, stylingStrategies, framerMotion, reactTestingLibrary, deploymentProduction],
 };
 
